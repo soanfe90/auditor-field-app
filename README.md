@@ -114,7 +114,9 @@ For each material in `data.json`, match by `id` to the asset, then:
 
 ## Notes / limits (it's a prototype)
 
-- Photos are downscaled to ~2000 px, JPEG ~82%, on-device. Originals are not kept.
+- Photos are downscaled to ~2000 px, JPEG ~82%, on-device. Originals are not kept. You can add
+  up to 4 photos per tap; the picker offers the camera or the gallery (gallery allows multi-select).
+- Category headers in the asset list collapse and expand on tap (search temporarily expands all).
 - All capture data lives in IndexedDB on the phone. Export regularly; iOS can evict storage
   under pressure. The header shows how many materials are waiting to export.
 - GPS is best-effort per photo (8 s timeout); "no fix" is recorded if unavailable.
