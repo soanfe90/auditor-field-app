@@ -114,8 +114,13 @@ For each material in `data.json`, match by `id` to the asset, then:
 
 ## Notes / limits (it's a prototype)
 
-- Photos are downscaled to ~2000 px, JPEG ~82%, on-device. Originals are not kept. You can add
-  up to 4 photos per tap; the picker offers the camera or the gallery (gallery allows multi-select).
+- Two photo sources: "Take photos" opens an in-app camera where you can snap several shots in
+  one session and tap Done to save them all; "From device" picks up to 4 from the gallery. On a
+  device without camera access the camera button falls back to the file picker.
+- Photos are downscaled to ~2000 px, JPEG ~82%, on-device. Originals are not kept.
+- "Duplicate this asset" (on a material screen) makes a copy for capturing a second instance of
+  the same item. Duplicates carry `is_duplicate` and `duplicate_of` in the export, and the
+  desktop apps add them as new asset rows automatically on import.
 - Category headers in the asset list collapse and expand on tap (search temporarily expands all).
 - All capture data lives in IndexedDB on the phone. Export regularly; iOS can evict storage
   under pressure. The header shows how many materials are waiting to export.
