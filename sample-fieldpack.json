@@ -1,0 +1,116 @@
+{
+  "format": "bca-fieldpack",
+  "version": 1,
+  "project": {
+    "id": "sample-123-main",
+    "name": "123 Main St — sample",
+    "details": {
+      "Client": "Demo Holdings",
+      "Site ID": "S-0042",
+      "Building Name": "Main St Office"
+    }
+  },
+  "capture_fields": [
+    {
+      "key": "condition",
+      "label": "Condition",
+      "type": "select",
+      "options": [
+        "Good",
+        "Fair",
+        "Poor",
+        "Failed"
+      ]
+    },
+    {
+      "key": "rul",
+      "label": "Est. remaining life (yrs)",
+      "type": "number",
+      "placeholder": "e.g. 10"
+    },
+    {
+      "key": "qty",
+      "label": "Approx. quantity",
+      "type": "text",
+      "placeholder": "e.g. 250 m²"
+    },
+    {
+      "key": "notes",
+      "label": "Field notes",
+      "type": "textarea",
+      "placeholder": "Observations, defects, location…"
+    }
+  ],
+  "materials": [
+    {
+      "id": "m-001",
+      "category": "Roofing",
+      "subcategory": "Low-slope membrane",
+      "ref_code": "RF-01",
+      "name": "Modified bitumen — main roof"
+    },
+    {
+      "id": "m-002",
+      "category": "Roofing",
+      "subcategory": "Flashing & parapets",
+      "ref_code": "RF-04",
+      "name": "Metal cap flashing"
+    },
+    {
+      "id": "m-003",
+      "category": "Roofing",
+      "subcategory": "Roof drains",
+      "ref_code": "RF-07",
+      "name": "Interior drains"
+    },
+    {
+      "id": "m-004",
+      "category": "Exterior walls",
+      "subcategory": "Cladding",
+      "ref_code": "EW-01",
+      "name": "Brick veneer — north & east"
+    },
+    {
+      "id": "m-005",
+      "category": "Exterior walls",
+      "subcategory": "Sealants",
+      "ref_code": "EW-05",
+      "name": "Perimeter window sealant"
+    },
+    {
+      "id": "m-006",
+      "category": "Exterior walls",
+      "subcategory": "Glazing",
+      "ref_code": "EW-08",
+      "name": "Aluminium-framed windows"
+    },
+    {
+      "id": "m-007",
+      "category": "Mechanical",
+      "subcategory": "Heating",
+      "ref_code": "ME-01",
+      "name": "Rooftop gas units (x3)"
+    },
+    {
+      "id": "m-008",
+      "category": "Mechanical",
+      "subcategory": "Domestic hot water",
+      "ref_code": "ME-04",
+      "name": "Gas-fired water heater"
+    },
+    {
+      "id": "m-009",
+      "category": "Site & civil",
+      "subcategory": "Paving",
+      "ref_code": "SC-02",
+      "name": "Asphalt parking lot"
+    },
+    {
+      "id": "m-010",
+      "category": "Site & civil",
+      "subcategory": "Site lighting",
+      "ref_code": "SC-06",
+      "name": "Pole-mounted LED fixtures"
+    }
+  ]
+}
