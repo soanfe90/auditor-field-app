@@ -216,7 +216,7 @@
   .col-shutter:active{transform:scale(.93)}
   .col-shutter.armed{border-color:var(--hi);box-shadow:0 0 0 3px rgba(234,88,12,.5)}
   /* fields popout (after a shot) */
-  .col-pop{position:absolute;left:0;right:0;bottom:0;z-index:5;max-height:74vh;overflow-y:auto;
+  .col-pop{position:absolute;left:0;right:0;bottom:0;z-index:10;max-height:74vh;overflow-y:auto;
     background:var(--surface);border-top-left-radius:18px;border-top-right-radius:18px;
     padding:16px 16px calc(env(safe-area-inset-bottom) + 90px);transform:translateY(100%);
     transition:transform .18s ease;box-shadow:0 -8px 30px rgba(0,0,0,.4)}
@@ -226,7 +226,7 @@
   .col-pop .poptitle{flex:1;min-width:0}
   .col-pop .poptitle .pt1{font-weight:700;font-size:15px}
   .col-pop .poptitle .pt2{font-size:12px;color:var(--muted);font-family:var(--mono)}
-  .col-popbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;gap:10px;
+  .col-popbar{position:absolute;left:0;right:0;bottom:0;z-index:11;display:flex;gap:10px;
     padding:10px 16px calc(env(safe-area-inset-bottom) + 14px);background:var(--surface);
     border-top:1px solid var(--line)}
   .col-popbar.show{display:flex}
@@ -277,11 +277,16 @@
     background:linear-gradient(transparent,rgba(0,0,0,.6))}
   .col-prevbar .btn{flex:0 1 200px;height:52px}
   .col-prevbar .btn.ghost{flex:0 0 auto;width:auto;padding:0 18px}
+  /* "Add data" mode: hide the Next bar, keep the photo above the fields sheet (portrait) */
+  .col-preview.fields .col-prevbar{display:none}
+  .col-preview.fields img{padding-bottom:48vh}
   @media (orientation:landscape){
     .col-prevbar{left:auto;right:0;top:0;bottom:0;flex-direction:column;justify-content:center;width:200px;
       background:linear-gradient(270deg,rgba(0,0,0,.6),transparent);padding:0 18px}
     .col-prevbar .btn,.col-prevbar .btn.ghost{width:100%;flex:0 0 auto}
     .col-preview img{padding-right:200px}
+    /* "Add data" mode: keep the photo to the LEFT of the fields panel */
+    .col-preview.fields img{padding:0 444px 0 0}
   }
   /* photo tray */
   .col-tray{position:absolute;inset:0;z-index:9;background:rgba(0,0,0,.92);display:flex;flex-direction:column}
@@ -987,7 +992,7 @@ async function focusAt(clientX,clientY){
 }
 
 /* ---- take a shot -> PREVIEW (data fields are optional, via "Add data") ---- */
-async function colSnap(){
+function colSnap(){
   if(!$('#col-preview').classList.contains('hide'))return;   // ignore while previewing
   const v=$('#col-video'); if(!v.videoWidth)return;
   const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
@@ -997,61 +1002,61 @@ async function colSnap(){
   if(digitalZoom&&zoom>1){ const sw=v.videoWidth/zoom, sh=v.videoHeight/zoom;
     ctx.drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,cw,ch); }
   else ctx.drawImage(v,0,0,cw,ch);
-  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82)); if(!blob)return;
-  const capId=uid('cap-');
-  const cap={id:capId,projectId:project.id,categoryId:colCategory||'Uncategorised',
-             assetId:colAssetId,fields:{},gps:null,ts:new Date().toISOString()};
-  await putOf('cap',cap); caps.push(cap);
-  const pic={id:uid('pic-'),captureId:capId,projectId:project.id,ts:cap.ts,blob};
-  await putOf('pic',pic); pics.push(pic);
-  touchProject();
-  colPendingCap=cap;
-  $('#col-count').textContent=caps.length; renderColRail();
-  showPreview(blob);
-  getGPS().then(g=>{ if(g){ cap.gps=g; putOf('cap',cap); } });   // GPS in the background — shot is instant
+  cv.toBlob(blob=>{
+    if(!blob)return;
+    const cap={id:uid('cap-'),projectId:project.id,categoryId:colCategory||'Uncategorised',
+               assetId:colAssetId,fields:{},gps:null,ts:new Date().toISOString()};
+    colPendingCap=cap;
+    showPreview(blob);                       // IMMEDIATE — show options the instant the frame is ready
+    // everything below is background work (no awaits block the preview)
+    caps.push(cap);
+    const pic={id:uid('pic-'),captureId:cap.id,projectId:project.id,ts:cap.ts,blob};
+    pics.push(pic);
+    $('#col-count').textContent=caps.length; renderColRail();
+    putOf('cap',cap); putOf('pic',pic); touchProject();
+    getGPS().then(g=>{ if(g){ cap.gps=g; putOf('cap',cap); } });
+  },'image/jpeg',0.82);
 }
 function showPreview(blob){
   $('#col-previmg').src=objUrl(blob);
-  $('#col-preview').classList.remove('hide');
+  $('#col-preview').classList.remove('hide','fields');   // photo + Next/Add data/Delete bar
   $('#col-shutter').classList.add('armed');
 }
-function previewNext(){
-  $('#col-preview').classList.add('hide');
+/* leave the capture flow entirely -> back to the live camera */
+function exitCaptureFlow(){
   colPendingCap=null;
-  $('#col-shutter').classList.remove('armed');
-  syncColOrientation();
-}
-function previewAddData(){
-  $('#col-preview').classList.add('hide');
-  if(colPendingCap)showPopout(colPendingCap);
-}
-async function previewDelete(){
-  if(!colPendingCap)return;
-  await deleteCapture(colPendingCap.id);
-  $('#col-count').textContent=caps.length; renderColRail();
-  previewNext();
-}
-/* ---- data fields panel (only when "Add data" chosen) ---- */
-function showPopout(cap){
-  const pic=picForCapture(cap.id);
-  $('#col-popthumb').src=pic?objUrl(pic.blob):'';
-  $('#col-poptitle').textContent=cap.assetId!=null?colAssetName:'Unknown photo';
-  $('#col-popsub').textContent=(cap.categoryId||'')+(cap.assetId==null?' · file as Unknown':'');
-  const fields=project.snapshot.captureFields||[];
-  const wrap=$('#col-popfields');
-  wrap.innerHTML=fields.length?fields.map(f=>fieldHTML(f, cap.fields&&cap.fields[f.key]!=null?cap.fields[f.key]:'')).join(''):'<p style="color:var(--muted)">No fields in this template.</p>';
-  $('#col-pop').classList.add('show');
-  $('#col-popbar').classList.remove('hide'); $('#col-popbar').classList.add('show');
-  $('#col-shutter').classList.add('armed');
-  syncColOrientation();
-}
-function hidePopout(){
-  colPendingCap=null;
+  $('#col-preview').classList.add('hide'); $('#col-preview').classList.remove('fields');
   $('#col-pop').classList.remove('show');
   $('#col-popbar').classList.add('hide'); $('#col-popbar').classList.remove('show');
   $('#col-shutter').classList.remove('armed');
   syncColOrientation();
 }
+function previewNext(){ exitCaptureFlow(); }
+function previewAddData(){
+  if(!colPendingCap)return;
+  // keep the big photo on screen (".fields" hides the Next bar) and overlay the data fields
+  $('#col-preview').classList.add('fields');
+  showPopout(colPendingCap);
+}
+async function previewDelete(){
+  if(!colPendingCap)return; const id=colPendingCap.id;
+  exitCaptureFlow();
+  await deleteCapture(id);
+  $('#col-count').textContent=caps.length; renderColRail();
+}
+/* ---- data fields panel (only when "Add data" chosen) — photo stays visible behind/beside it ---- */
+function showPopout(cap){
+  $('#col-poptitle').textContent=cap.assetId!=null?colAssetName:'Unknown photo';
+  $('#col-popsub').textContent=(cap.categoryId||'')+(cap.assetId==null?' · file as Unknown':'');
+  $('#col-popthumb').classList.add('hidden');            // the full preview already shows the photo
+  const fields=project.snapshot.captureFields||[];
+  const wrap=$('#col-popfields');
+  wrap.innerHTML=fields.length?fields.map(f=>fieldHTML(f, cap.fields&&cap.fields[f.key]!=null?cap.fields[f.key]:'')).join(''):'<p style="color:var(--muted)">No fields in this template.</p>';
+  $('#col-pop').classList.add('show');
+  $('#col-popbar').classList.remove('hide'); $('#col-popbar').classList.add('show');
+  syncColOrientation();
+}
+function hidePopout(){ exitCaptureFlow(); }   // "Done" -> back to camera
 function colShutter(){ colSnap(); }
 async function colPopSave(key,val){
   if(!colPendingCap)return;
@@ -1059,9 +1064,10 @@ async function colPopSave(key,val){
   await putOf('cap',colPendingCap);
 }
 async function colPopDelete(){
-  if(!colPendingCap)return;
-  await deleteCapture(colPendingCap.id);
-  $('#col-count').textContent=caps.length; renderColRail(); hidePopout();
+  if(!colPendingCap)return; const id=colPendingCap.id;
+  exitCaptureFlow();
+  await deleteCapture(id);
+  $('#col-count').textContent=caps.length; renderColRail();
 }
 
 /* ---- photo tray (opened from the count badge): review/delete current category/asset ---- */
@@ -1306,14 +1312,7 @@ function wire(){
     else{colAssetId=null;colAssetName=null;}
     renderColAssetBar(); $('#col-assetlist').classList.remove('show'); updateColTag();
   });
-  wireFields($('#col-popfields'),colPopSave);
-  // select chips in popout
-  $('#col-popfields').addEventListener('click',e=>{
-    const opt=e.target.closest('.opt'); if(!opt)return;
-    const wrap=opt.closest('.opts'); const sel=wrap.querySelector('.opt.sel'); const same=sel===opt;
-    if(sel)sel.classList.remove('sel');
-    if(!same){opt.classList.add('sel');colPopSave(wrap.dataset.key,opt.dataset.val);}else colPopSave(wrap.dataset.key,'');
-  });
+  wireFields($('#col-popfields'),colPopSave);   // handles both text inputs AND select chips
   $('#col-popnext').onclick=hidePopout;
   $('#col-popdel').onclick=colPopDelete;
 
