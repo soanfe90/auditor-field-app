@@ -253,6 +253,50 @@
     .col-popbar{left:auto;right:104px;width:330px}
     .col-hint{max-width:60%}
   }
+  /* count badge is tappable (opens the photo tray) */
+  .col-count{cursor:pointer}
+  /* zoom control */
+  .col-zoom{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);translate:-50% 0;
+    z-index:3;display:flex;align-items:center;gap:2px;background:rgba(0,0,0,.5);border-radius:999px;padding:4px}
+  .col-zoom button{width:38px;height:38px;border:none;border-radius:50%;background:rgba(255,255,255,.14);
+    color:#fff;font-size:20px;line-height:1;cursor:pointer}
+  .col-zoom button:active{background:rgba(255,255,255,.3)}
+  .col-zoom #col-zoomval{color:#fff;font:600 13px/1 var(--mono);min-width:44px;text-align:center}
+  @media (orientation:landscape){ .col-zoom{left:auto;right:120px;bottom:calc(env(safe-area-inset-bottom) + 16px);translate:0 0} }
+  /* tap-to-focus ring */
+  .col-focus{position:absolute;width:74px;height:74px;border:2px solid #fff;border-radius:50%;
+    translate:-50% -50%;z-index:4;pointer-events:none;opacity:0;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+  .col-focus.show{animation:focusPulse .7s ease-out}
+  @keyframes focusPulse{0%{opacity:0;scale:1.6}30%{opacity:1}100%{opacity:0;scale:1}}
+  /* post-shot preview */
+  .col-preview{position:absolute;inset:0;z-index:8;background:#000;display:flex}
+  .col-preview.hide{display:none}
+  .col-preview img{width:100%;height:100%;object-fit:contain;background:#000}
+  .col-prevbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:center;
+    padding:14px 18px calc(env(safe-area-inset-bottom) + 18px);
+    background:linear-gradient(transparent,rgba(0,0,0,.6))}
+  .col-prevbar .btn{flex:0 1 200px;height:52px}
+  .col-prevbar .btn.ghost{flex:0 0 auto;width:auto;padding:0 18px}
+  @media (orientation:landscape){
+    .col-prevbar{left:auto;right:0;top:0;bottom:0;flex-direction:column;justify-content:center;width:200px;
+      background:linear-gradient(270deg,rgba(0,0,0,.6),transparent);padding:0 18px}
+    .col-prevbar .btn,.col-prevbar .btn.ghost{width:100%;flex:0 0 auto}
+    .col-preview img{padding-right:200px}
+  }
+  /* photo tray */
+  .col-tray{position:absolute;inset:0;z-index:9;background:rgba(0,0,0,.92);display:flex;flex-direction:column}
+  .col-tray.hide{display:none}
+  .tray-head{display:flex;align-items:center;justify-content:space-between;color:#fff;
+    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;font-weight:600}
+  .tray-head button{border:none;background:var(--hi);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+  .tray-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));
+    gap:8px;padding:0 16px calc(env(safe-area-inset-bottom) + 16px)}
+  .tray-tile{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#111}
+  .tray-tile img{width:100%;height:100%;object-fit:cover;display:block}
+  .tray-tile .tdata{position:absolute;left:4px;bottom:4px;font:600 9px/1 var(--mono);color:#fff;
+    background:var(--hi-press);padding:3px 5px;border-radius:4px}
+  .tray-tile .tdel{position:absolute;top:4px;right:4px;width:28px;height:28px;border:none;border-radius:6px;
+    background:rgba(0,0,0,.6);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -361,7 +405,25 @@
     <div id="col-assetlist" class="col-assetlist"></div>
   </div>
   <div class="col-bar"><button id="col-shutter" class="col-shutter" aria-label="Take photo"></button></div>
+  <div id="col-focus" class="col-focus"></div>
+  <div id="col-zoom" class="col-zoom">
+    <button data-z="out" aria-label="Zoom out">－</button>
+    <span id="col-zoomval">1.0×</span>
+    <button data-z="in" aria-label="Zoom in">＋</button>
+  </div>
   <div class="col-hint"><span class="rot">⟳</span>Turn your phone sideways<br>for the full camera layout</div>
+
+  <!-- after a shot: preview + Next / Add data -->
+  <div id="col-preview" class="col-preview hide">
+    <img id="col-previmg" alt="">
+    <div class="col-prevbar">
+      <button class="btn ghost" id="col-prevdel" aria-label="Discard">🗑</button>
+      <button class="btn ghost" id="col-prevadd">＋ Add data</button>
+      <button class="btn primary" id="col-prevnext">Next ▸</button>
+    </div>
+  </div>
+
+  <!-- data fields (only when "Add data" is chosen) -->
   <div id="col-pop" class="col-pop">
     <div class="pophead">
       <img id="col-popthumb" class="popthumb" alt="">
@@ -371,7 +433,13 @@
   </div>
   <div id="col-popbar" class="col-popbar hide">
     <button class="btn ghost" id="col-popdel" style="flex:none;width:54px;background:var(--danger)">🗑</button>
-    <button class="btn primary" id="col-popnext">Next photo ▸</button>
+    <button class="btn primary" id="col-popnext">Done ▸</button>
+  </div>
+
+  <!-- photo tray (opened from the count badge) -->
+  <div id="col-tray" class="col-tray hide">
+    <div class="tray-head"><span id="tray-title">Photos</span><button id="tray-close">Done</button></div>
+    <div id="tray-grid" class="tray-grid"></div>
   </div>
 </div>
 
@@ -832,6 +900,7 @@ async function openCollector(){
   }
   const v=$('#col-video'); v.srcObject=colStream;
   try{ await v.play(); }catch(_){}
+  initCameraControls();                // zoom + focus capabilities
   // 2) then force landscape (fullscreen + orientation lock)
   await enterCollectorMode();
   syncColOrientation();
@@ -844,10 +913,12 @@ function syncColOrientation(){
 }
 function closeCollector(){
   if(colStream){colStream.getTracks().forEach(t=>t.stop());colStream=null;}
-  $('#col-video').srcObject=null;
+  colTrack=null;
+  $('#col-video').srcObject=null; $('#col-video').style.transform='';
   exitCollectorMode();                 // release orientation lock + leave fullscreen
   $('#collector').classList.add('hidden');
-  hidePopout();
+  $('#col-preview').classList.add('hide'); $('#col-tray').classList.add('hide');
+  hidePopout(); freeUrls();
   // refresh panel to reflect new captures
   renderPanel(); updatePanelPill();
 }
@@ -874,33 +945,101 @@ function updateColTag(){
   if(colAssetId!=null)tag.innerHTML='<b>'+esc(colAssetName)+'</b> · '+esc(colCategory);
   else tag.innerHTML='<b>Unknown</b> · '+esc(colCategory||'pick a category');
 }
+/* ---- camera controls: zoom + tap-to-focus ---- */
+let colTrack=null, zoomCaps=null, zoom=1, digitalZoom=false;
+function initCameraControls(){
+  colTrack=colStream?colStream.getVideoTracks()[0]:null;
+  zoom=1; digitalZoom=false; zoomCaps=null;
+  $('#col-video').style.transform='';
+  try{
+    const caps=(colTrack&&colTrack.getCapabilities)?colTrack.getCapabilities():{};
+    if(caps&&caps.zoom&&typeof caps.zoom.max==='number'){
+      zoomCaps={min:caps.zoom.min||1,max:caps.zoom.max,step:caps.zoom.step||0.1};
+    }
+    if(caps&&Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous')){
+      colTrack.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{});
+    }
+  }catch(e){}
+  if(!zoomCaps){ digitalZoom=true; zoomCaps={min:1,max:4,step:0.2}; }  // hardware unavailable -> digital
+  applyZoom(1);
+}
+function applyZoom(z){
+  if(!zoomCaps)return;
+  z=Math.max(zoomCaps.min,Math.min(zoomCaps.max,z)); zoom=z;
+  if(digitalZoom){ $('#col-video').style.transform=z>1?('scale('+z+')'):''; }
+  else { try{ colTrack.applyConstraints({advanced:[{zoom:z}]}); }catch(e){} }
+  $('#col-zoomval').textContent=zoom.toFixed(1)+'×';
+}
+function zoomStep(dir){ if(!zoomCaps)return; const inc=Math.max(zoomCaps.step,(zoomCaps.max-zoomCaps.min)/8); applyZoom(zoom+dir*inc); }
+async function focusAt(clientX,clientY){
+  const ring=$('#col-focus'), host=$('#collector').getBoundingClientRect();
+  ring.style.left=(clientX-host.left)+'px'; ring.style.top=(clientY-host.top)+'px';
+  ring.classList.remove('show'); void ring.offsetWidth; ring.classList.add('show');
+  try{
+    const caps=(colTrack&&colTrack.getCapabilities)?colTrack.getCapabilities():{};
+    const v=$('#col-video'), r=v.getBoundingClientRect();
+    const x=Math.min(1,Math.max(0,(clientX-r.left)/r.width)), y=Math.min(1,Math.max(0,(clientY-r.top)/r.height));
+    const adv={};
+    if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('single-shot'))adv.focusMode='single-shot';
+    if(caps.pointsOfInterest)adv.pointsOfInterest=[{x,y}];
+    if(Object.keys(adv).length)await colTrack.applyConstraints({advanced:[adv]});
+  }catch(e){}
+}
+
+/* ---- take a shot -> PREVIEW (data fields are optional, via "Add data") ---- */
 async function colSnap(){
+  if(!$('#col-preview').classList.contains('hide'))return;   // ignore while previewing
   const v=$('#col-video'); if(!v.videoWidth)return;
   const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
   const cw=Math.round(v.videoWidth*scale), ch=Math.round(v.videoHeight*scale);
   const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
-  cv.getContext('2d').drawImage(v,0,0,cw,ch);
+  const ctx=cv.getContext('2d');
+  if(digitalZoom&&zoom>1){ const sw=v.videoWidth/zoom, sh=v.videoHeight/zoom;
+    ctx.drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,cw,ch); }
+  else ctx.drawImage(v,0,0,cw,ch);
   const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82)); if(!blob)return;
-  const gps=await getGPS();
   const capId=uid('cap-');
   const cap={id:capId,projectId:project.id,categoryId:colCategory||'Uncategorised',
-             assetId:colAssetId,fields:{},gps,ts:new Date().toISOString()};
+             assetId:colAssetId,fields:{},gps:null,ts:new Date().toISOString()};
   await putOf('cap',cap); caps.push(cap);
   const pic={id:uid('pic-'),captureId:capId,projectId:project.id,ts:cap.ts,blob};
   await putOf('pic',pic); pics.push(pic);
   touchProject();
   colPendingCap=cap;
-  $('#col-count').textContent=caps.length;
-  renderColRail();
-  showPopout(cap,blob);
+  $('#col-count').textContent=caps.length; renderColRail();
+  showPreview(blob);
+  getGPS().then(g=>{ if(g){ cap.gps=g; putOf('cap',cap); } });   // GPS in the background — shot is instant
 }
-function showPopout(cap,blob){
-  $('#col-popthumb').src=objUrl(blob);
-  $('#col-poptitle').textContent=colAssetId!=null?colAssetName:'Unknown photo';
-  $('#col-popsub').textContent=(colCategory||'')+(colAssetId==null?' · file as Unknown':'');
+function showPreview(blob){
+  $('#col-previmg').src=objUrl(blob);
+  $('#col-preview').classList.remove('hide');
+  $('#col-shutter').classList.add('armed');
+}
+function previewNext(){
+  $('#col-preview').classList.add('hide');
+  colPendingCap=null;
+  $('#col-shutter').classList.remove('armed');
+  syncColOrientation();
+}
+function previewAddData(){
+  $('#col-preview').classList.add('hide');
+  if(colPendingCap)showPopout(colPendingCap);
+}
+async function previewDelete(){
+  if(!colPendingCap)return;
+  await deleteCapture(colPendingCap.id);
+  $('#col-count').textContent=caps.length; renderColRail();
+  previewNext();
+}
+/* ---- data fields panel (only when "Add data" chosen) ---- */
+function showPopout(cap){
+  const pic=picForCapture(cap.id);
+  $('#col-popthumb').src=pic?objUrl(pic.blob):'';
+  $('#col-poptitle').textContent=cap.assetId!=null?colAssetName:'Unknown photo';
+  $('#col-popsub').textContent=(cap.categoryId||'')+(cap.assetId==null?' · file as Unknown':'');
   const fields=project.snapshot.captureFields||[];
   const wrap=$('#col-popfields');
-  wrap.innerHTML=fields.length?fields.map(f=>fieldHTML(f,'')).join(''):'<p style="color:var(--muted)">No fields in this template — tap Next for the next photo.</p>';
+  wrap.innerHTML=fields.length?fields.map(f=>fieldHTML(f, cap.fields&&cap.fields[f.key]!=null?cap.fields[f.key]:'')).join(''):'<p style="color:var(--muted)">No fields in this template.</p>';
   $('#col-pop').classList.add('show');
   $('#col-popbar').classList.remove('hide'); $('#col-popbar').classList.add('show');
   $('#col-shutter').classList.add('armed');
@@ -913,8 +1052,7 @@ function hidePopout(){
   $('#col-shutter').classList.remove('armed');
   syncColOrientation();
 }
-/* shutter is a toggle: if a popout is open, commit & re-arm; else take a shot */
-function colShutter(){ if(colPendingCap)hidePopout(); else colSnap(); }
+function colShutter(){ colSnap(); }
 async function colPopSave(key,val){
   if(!colPendingCap)return;
   colPendingCap.fields=colPendingCap.fields||{}; colPendingCap.fields[key]=val; colPendingCap.updatedAt=Date.now();
@@ -923,9 +1061,35 @@ async function colPopSave(key,val){
 async function colPopDelete(){
   if(!colPendingCap)return;
   await deleteCapture(colPendingCap.id);
-  $('#col-count').textContent=caps.length;
-  renderColRail(); hidePopout();
+  $('#col-count').textContent=caps.length; renderColRail(); hidePopout();
 }
+
+/* ---- photo tray (opened from the count badge): review/delete current category/asset ---- */
+function trayCaps(){
+  return caps.filter(c=>(c.categoryId||'Uncategorised')===colCategory && (colAssetId==null||c.assetId===colAssetId))
+             .sort((a,b)=>(a.ts||'').localeCompare(b.ts||''));
+}
+function openTray(){
+  if(!caps.length){toast('No photos yet');return;}
+  renderTray(); $('#col-tray').classList.remove('hide');
+}
+function renderTray(){
+  const list=trayCaps();
+  $('#tray-title').textContent=(colAssetId!=null?colAssetName:colCategory+' (all)')+' — '+list.length+' photo'+(list.length===1?'':'s');
+  const grid=$('#tray-grid');
+  if(!list.length){grid.innerHTML='<p style="color:#94a3b8;grid-column:1/-1">No photos for this '+(colAssetId!=null?'asset':'category')+' yet.</p>';return;}
+  let h='';
+  for(const c of list){ const pic=picForCapture(c.id); if(!pic)continue;
+    h+='<div class="tray-tile"><img src="'+objUrl(pic.blob)+'" alt="">'
+      +(fieldsFilled(c)?'<span class="tdata">data</span>':'')
+      +'<button class="tdel" data-tdel="'+esc(c.id)+'">✕</button></div>'; }
+  grid.innerHTML=h;
+}
+async function trayDelete(capId){
+  await deleteCapture(capId);
+  $('#col-count').textContent=caps.length; renderColRail(); renderTray();
+}
+function closeTray(){ $('#col-tray').classList.add('hide'); }
 
 /* ===================== EXPORT (phone -> desktop) =====================
    v2 field data. Single project => one zip. Batch => one zip with projects/<id>/.
@@ -1152,6 +1316,43 @@ function wire(){
   });
   $('#col-popnext').onclick=hidePopout;
   $('#col-popdel').onclick=colPopDelete;
+
+  // preview (after a shot): Next / Add data / discard
+  $('#col-prevnext').onclick=previewNext;
+  $('#col-prevadd').onclick=previewAddData;
+  $('#col-prevdel').onclick=()=>{ if(confirm('Discard this photo?'))previewDelete(); };
+
+  // zoom buttons
+  $('#col-zoom').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-z]'); if(!b)return;
+    zoomStep(b.dataset.z==='in'?1:-1);
+  });
+
+  // tap-to-focus + pinch-to-zoom on the live camera
+  const vid=$('#col-video'); let pinchStart=0, pinchZoom=1, tapPt=null;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+  vid.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){ pinchStart=dist(e.touches); pinchZoom=zoom; tapPt=null; }
+    else if(e.touches.length===1){ tapPt={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; }
+  },{passive:true});
+  vid.addEventListener('touchmove',e=>{
+    if(e.touches.length===2 && pinchStart){ e.preventDefault(); applyZoom(pinchZoom*dist(e.touches)/pinchStart); tapPt=null; }
+  },{passive:false});
+  vid.addEventListener('touchend',e=>{
+    if(e.touches.length<2)pinchStart=0;
+    if(tapPt && Date.now()-tapPt.t<400){ const c=e.changedTouches[0];
+      if(Math.hypot(c.clientX-tapPt.x,c.clientY-tapPt.y)<14) focusAt(c.clientX,c.clientY); }
+    tapPt=null;
+  },{passive:true});
+  vid.addEventListener('click',e=>focusAt(e.clientX,e.clientY));   // desktop / non-touch
+
+  // photo count badge -> tray for the current category/asset
+  $('#col-count').onclick=openTray;
+  $('#tray-close').onclick=closeTray;
+  $('#tray-grid').addEventListener('click',e=>{
+    const d=e.target.closest('[data-tdel]'); if(!d)return;
+    if(confirm('Delete this photo?'))trayDelete(d.dataset.tdel);
+  });
 
   // keep collector layout/hint in sync when the phone is rotated
   window.addEventListener('resize',()=>{ if(!$('#collector').classList.contains('hidden')) syncColOrientation(); });
