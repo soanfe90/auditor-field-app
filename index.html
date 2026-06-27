@@ -231,6 +231,27 @@
     border-top:1px solid var(--line)}
   .col-popbar.show{display:flex}
   .col-popbar.hide{display:none}
+  /* rotate hint (shown when collector is opened in portrait) */
+  .col-hint{position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:7;
+    background:rgba(0,0,0,.72);color:#fff;border-radius:14px;padding:18px 22px;text-align:center;
+    font-size:15px;max-width:78%;display:none}
+  .col-hint .rot{font-size:34px;display:block;margin-bottom:8px}
+  .collector.portrait .col-hint{display:block}
+  /* ---- Landscape: rail | camera | fields side-by-side (the intended field layout) ---- */
+  @media (orientation:landscape){
+    .col-rail{width:138px;padding:calc(env(safe-area-inset-top) + 54px) 8px 16px 10px}
+    .col-assetbar{left:148px;right:auto;width:320px;top:calc(env(safe-area-inset-top) + 54px)}
+    .col-assetlist{max-height:62vh}
+    /* fields popout slides in from the RIGHT as a full-height panel */
+    .col-pop{left:auto;right:0;top:0;bottom:0;width:360px;max-height:none;height:100%;
+      border-radius:0;transform:translateX(100%);
+      padding:calc(env(safe-area-inset-top) + 14px) 16px 84px}
+    .col-pop.show{transform:translateX(0)}
+    .col-popbar{left:auto;right:0;width:360px}
+    /* keep the shutter centered in the camera area when the right panel is open */
+    .collector:has(.col-pop.show) .col-bar{right:360px}
+    .col-hint{max-width:60%}
+  }
 </style>
 </head>
 <body>
@@ -339,6 +360,7 @@
     <div id="col-assetlist" class="col-assetlist"></div>
   </div>
   <div class="col-bar"><button id="col-shutter" class="col-shutter" aria-label="Take photo"></button></div>
+  <div class="col-hint"><span class="rot">⟳</span>Turn your phone sideways<br>for the full camera layout</div>
   <div id="col-pop" class="col-pop">
     <div class="pophead">
       <img id="col-popthumb" class="popthumb" alt="">
@@ -779,12 +801,18 @@ async function openCollector(){
   const cats=categoriesOf(project.snapshot);
   colCategory=cats[0]||'Uncategorised'; colAssetId=null; colAssetName=null; colPendingCap=null;
   renderColRail(); renderColAssetBar(); updateColTag(); hidePopout();
+  syncColOrientation();
   $('#col-count').textContent=caps.length;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('No camera here — use “Take photo” in an asset');return;}
   try{colStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
   catch(e){toast('Camera unavailable');return;}
   $('#col-video').srcObject=colStream;
   $('#collector').classList.remove('hidden');
+}
+function syncColOrientation(){
+  // portrait class drives the "rotate your phone" hint; landscape gets the side-by-side layout via CSS
+  const portrait=window.innerHeight>window.innerWidth;
+  $('#collector').classList.toggle('portrait', portrait && !colPendingCap);
 }
 function closeCollector(){
   if(colStream){colStream.getTracks().forEach(t=>t.stop());colStream=null;}
@@ -847,12 +875,14 @@ function showPopout(cap,blob){
   $('#col-pop').classList.add('show');
   $('#col-popbar').classList.remove('hide'); $('#col-popbar').classList.add('show');
   $('#col-shutter').classList.add('armed');
+  syncColOrientation();
 }
 function hidePopout(){
   colPendingCap=null;
   $('#col-pop').classList.remove('show');
   $('#col-popbar').classList.add('hide'); $('#col-popbar').classList.remove('show');
   $('#col-shutter').classList.remove('armed');
+  syncColOrientation();
 }
 /* shutter is a toggle: if a popout is open, commit & re-arm; else take a shot */
 function colShutter(){ if(colPendingCap)hidePopout(); else colSnap(); }
@@ -1093,6 +1123,9 @@ function wire(){
   });
   $('#col-popnext').onclick=hidePopout;
   $('#col-popdel').onclick=colPopDelete;
+
+  // keep collector layout/hint in sync when the phone is rotated
+  window.addEventListener('resize',()=>{ if(!$('#collector').classList.contains('hidden')) syncColOrientation(); });
 }
 
 boot().catch(e=>{document.body.innerHTML='<div class="center"><h1>Storage unavailable</h1><p>This browser blocked local storage. Open the app in a normal (non-private) tab over https.</p></div>';console.error(e);});
