@@ -242,14 +242,15 @@
     .col-rail{width:138px;padding:calc(env(safe-area-inset-top) + 54px) 8px 16px 10px}
     .col-assetbar{left:148px;right:auto;width:320px;top:calc(env(safe-area-inset-top) + 54px)}
     .col-assetlist{max-height:62vh}
-    /* fields popout slides in from the RIGHT as a full-height panel */
-    .col-pop{left:auto;right:0;top:0;bottom:0;width:360px;max-height:none;height:100%;
-      border-radius:0;transform:translateX(100%);
+    /* shutter lives on the RIGHT edge, vertically centered (landscape camera convention) */
+    .col-bar{left:auto;right:0;top:0;bottom:0;width:104px;flex-direction:column;
+      padding:0;background:linear-gradient(270deg,rgba(0,0,0,.55),transparent)}
+    /* fields popout slides in just to the LEFT of the shutter column, so the shutter stays reachable */
+    .col-pop{left:auto;right:104px;top:0;bottom:0;width:330px;max-height:none;height:100%;
+      border-radius:0;transform:translateX(140%);
       padding:calc(env(safe-area-inset-top) + 14px) 16px 84px}
     .col-pop.show{transform:translateX(0)}
-    .col-popbar{left:auto;right:0;width:360px}
-    /* keep the shutter centered in the camera area when the right panel is open */
-    .collector:has(.col-pop.show) .col-bar{right:360px}
+    .col-popbar{left:auto;right:104px;width:330px}
     .col-hint{max-width:60%}
   }
 </style>
@@ -822,11 +823,19 @@ async function openCollector(){
   $('#col-count').textContent=caps.length;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('No camera here — use “Take photo” in an asset');return;}
   const el=$('#collector'); el.classList.remove('hidden');
-  await enterCollectorMode();          // fullscreen + lock landscape, using the button-tap gesture
+  // 1) start the camera FIRST so the live feed is reliable, before any fullscreen/rotation
+  try{
+    colStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+  }catch(e){
+    toast('Camera blocked — allow camera access for this site, then reopen'); el.classList.add('hidden'); return;
+  }
+  const v=$('#col-video'); v.srcObject=colStream;
+  try{ await v.play(); }catch(_){}
+  // 2) then force landscape (fullscreen + orientation lock)
+  await enterCollectorMode();
   syncColOrientation();
-  try{colStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
-  catch(e){toast('Camera unavailable');await exitCollectorMode();el.classList.add('hidden');return;}
-  $('#col-video').srcObject=colStream;
+  try{ await v.play(); }catch(_){}     // re-kick playback after the rotation/resize
 }
 function syncColOrientation(){
   // portrait class drives the "rotate your phone" hint (only matters when the lock fails, e.g. iOS)
