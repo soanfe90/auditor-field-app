@@ -797,26 +797,46 @@ async function addCapturesFromBlobs(blobs,assetId,category){
 /* ===================== DATA COLLECTOR (camera-first) ===================== */
 let colStream=null, colCategory=null, colAssetId=null, colAssetName=null;
 let colPendingCap=null;  // capture awaiting field input (popout open)
+/* Force landscape: go fullscreen on the collector, then lock the screen orientation.
+   Works on Android/Chrome (your Pixel). iOS Safari ignores the lock -> we fall back to
+   the CSS "rotate your phone" hint. Must run inside the button-tap gesture. */
+async function enterCollectorMode(){
+  const el=$('#collector');
+  try{
+    if(el.requestFullscreen) await el.requestFullscreen({navigationUI:'hide'});
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }catch(e){/* fullscreen denied -> orientation lock will simply no-op below */}
+  try{
+    if(screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
+  }catch(e){/* unsupported (iOS) or not allowed -> rotate hint covers it */}
+}
+async function exitCollectorMode(){
+  try{ if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
+  try{ if(document.fullscreenElement) await document.exitFullscreen();
+       else if(document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen(); }catch(e){}
+}
 async function openCollector(){
   const cats=categoriesOf(project.snapshot);
   colCategory=cats[0]||'Uncategorised'; colAssetId=null; colAssetName=null; colPendingCap=null;
   renderColRail(); renderColAssetBar(); updateColTag(); hidePopout();
-  syncColOrientation();
   $('#col-count').textContent=caps.length;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('No camera here — use “Take photo” in an asset');return;}
+  const el=$('#collector'); el.classList.remove('hidden');
+  await enterCollectorMode();          // fullscreen + lock landscape, using the button-tap gesture
+  syncColOrientation();
   try{colStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
-  catch(e){toast('Camera unavailable');return;}
+  catch(e){toast('Camera unavailable');await exitCollectorMode();el.classList.add('hidden');return;}
   $('#col-video').srcObject=colStream;
-  $('#collector').classList.remove('hidden');
 }
 function syncColOrientation(){
-  // portrait class drives the "rotate your phone" hint; landscape gets the side-by-side layout via CSS
+  // portrait class drives the "rotate your phone" hint (only matters when the lock fails, e.g. iOS)
   const portrait=window.innerHeight>window.innerWidth;
   $('#collector').classList.toggle('portrait', portrait && !colPendingCap);
 }
 function closeCollector(){
   if(colStream){colStream.getTracks().forEach(t=>t.stop());colStream=null;}
   $('#col-video').srcObject=null;
+  exitCollectorMode();                 // release orientation lock + leave fullscreen
   $('#collector').classList.add('hidden');
   hidePopout();
   // refresh panel to reflect new captures
