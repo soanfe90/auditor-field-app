@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Auditor · Site Capture</title>
+<meta name="theme-color" content="#1E3A8A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Site Capture">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --ink:#1E3A8A; --ink-2:#16306f; --ink-3:#2c4ba0;
+    --bg:#F8FAFC; --surface:#ffffff; --surface-2:#f1f5f9;
+    --text:#0F172A; --muted:#64748B; --faint:#94A3B8;
+    --line:rgba(15,23,42,.12); --line-strong:rgba(15,23,42,.20);
+    --hi:#EA580C; --hi-press:#C2410C; --on-hi:#ffffff;
+    --todo:#64748B; --prog:#1E3A8A; --done:#16A34A; --danger:#DC2626;
+    --r:12px; --r-sm:8px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --surface:#111a2e; --surface-2:#16213a;
+      --text:#e8edf6; --muted:#94a3b8; --faint:#64748b;
+      --line:rgba(255,255,255,.10); --line-strong:rgba(255,255,255,.22);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);
+    font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none}
+  .app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+    background:var(--bg);position:relative}
+  /* Header */
+  header{position:sticky;top:0;z-index:30;background:var(--ink);color:#fff;
+    padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
+  .hrow{display:flex;align-items:center;gap:10px}
+  .brand{width:34px;height:34px;flex:none;display:block;border-radius:50%}
+  .brandbig{width:76px;height:76px;display:block;margin:0 auto 16px}
+  .htxt{flex:1;min-width:0}
+  .heyebrow{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+    color:var(--hi);margin-bottom:3px}
+  .hname{font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pill{display:inline-flex;align-items:center;gap:6px;font:500 12px/1 var(--mono);
+    color:#fff;background:var(--ink-3);border:1px solid rgba(255,255,255,.14);
+    padding:7px 10px;border-radius:999px;white-space:nowrap}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--hi)}
+  .pill.clean .dot{background:var(--done)}
+  .iconbtn{appearance:none;border:1px solid rgba(255,255,255,.16);background:var(--ink-2);
+    color:#fff;width:42px;height:42px;border-radius:var(--r-sm);font-size:18px;cursor:pointer}
+  .iconbtn:active{background:var(--ink-3)}
+  /* Search */
+  .search{padding:10px 14px;position:sticky;top:0;z-index:20}
+  .search input{width:100%;height:46px;border:1px solid var(--line);background:var(--surface);
+    color:var(--text);border-radius:var(--r-sm);padding:0 14px;font-size:16px}
+  .search input::placeholder{color:var(--faint)}
+  /* Content */
+  main{flex:1;padding:4px 14px 120px}
+  .group{margin-top:18px}
+  .glabel{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);padding:9px 2px;display:flex;justify-content:space-between;align-items:center;
+    cursor:pointer;user-select:none}
+  .glabel .count{color:var(--faint)}
+  .glabel .gtitle{display:flex;align-items:center;gap:7px}
+  .glabel .chev{display:inline-block;font-size:12px;color:var(--faint);transition:transform .15s}
+  .glabel.collapsed .chev{transform:rotate(-90deg)}
+  /* Material card */
+  .card{display:flex;align-items:stretch;gap:0;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden;
+    cursor:pointer;transition:transform .04s ease}
+  .card:active{transform:scale(.992)}
+  .spine{width:5px;flex:none;background:var(--todo)}
+  .spine.s-progress{background:var(--prog)} .spine.s-done{background:var(--done)}
+  .cbody{flex:1;min-width:0;padding:13px 14px}
+  .cname{font-weight:600;font-size:16px;line-height:1.25}
+  .cmeta{display:flex;gap:8px;align-items:center;margin-top:5px;color:var(--muted);font-size:13px}
+  .ref{font:500 12px/1 var(--mono);color:var(--muted);background:var(--surface-2);
+    border:1px solid var(--line);padding:3px 7px;border-radius:5px}
+  .cright{flex:none;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+    padding:13px 14px;gap:6px}
+  .chip{font:600 13px/1 var(--mono);color:var(--text);background:var(--surface-2);
+    border:1px solid var(--line);padding:6px 9px;border-radius:999px;display:flex;align-items:center;gap:5px}
+  .chip.empty{color:var(--faint)}
+  .stag{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .stag.t-progress{color:var(--prog)} .stag.t-done{color:var(--done)}
+  /* Detail */
+  .dhead{padding:6px 2px 4px}
+  .dcat{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .dname{font-weight:600;font-size:22px;line-height:1.2;margin:6px 0 8px}
+  .sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px;margin-top:14px}
+  .sec h3{margin:0 0 12px;font-size:13px;font-weight:500;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:14px;font-weight:500;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;border:1px solid var(--line-strong);
+    background:var(--surface-2);color:var(--text);border-radius:var(--r-sm);
+    padding:12px 12px;font-size:16px;font-family:var(--sans)}
+  .field textarea{min-height:84px;resize:vertical}
+  .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6f76' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{flex:1 1 auto;min-width:72px;text-align:center;border:1px solid var(--line-strong);
+    background:var(--surface-2);color:var(--text);border-radius:var(--r-sm);padding:11px 8px;
+    font-size:15px;font-weight:500;cursor:pointer;user-select:none}
+  .opt.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+  /* Photo grid */
+  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .ptile{position:relative;aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;
+    background:var(--surface-2);border:1px solid var(--line)}
+  .ptile img{width:100%;height:100%;object-fit:cover;display:block}
+  .ptile .gps{position:absolute;left:0;right:0;bottom:0;font:500 9px/1.2 var(--mono);
+    color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:10px 5px 4px;
+    display:flex;align-items:center;gap:3px}
+  .ptile .del{position:absolute;top:4px;right:4px;width:26px;height:26px;border:none;
+    border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .padd{aspect-ratio:1;border:1.5px dashed var(--line-strong);border-radius:var(--r-sm);
+    background:var(--surface-2);color:var(--muted);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500}
+  .padd .plus{font-size:26px;line-height:1;color:var(--hi-press)}
+  /* Done toggle row */
+  .donerow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px;margin-top:14px}
+  .donerow .lbl{font-weight:500}
+  .donerow .sub{font-size:13px;color:var(--muted);margin-top:2px}
+  .switch{position:relative;width:52px;height:30px;flex:none}
+  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .switch .track{position:absolute;inset:0;background:var(--line-strong);border-radius:999px;transition:background .15s}
+  .switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;
+    border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .switch input:checked ~ .track{background:var(--done)}
+  .switch input:checked ~ .knob{transform:translateX(22px)}
+  /* Bottom bar */
+  .bbar{position:fixed;left:0;right:0;bottom:0;z-index:30;
+    padding:10px 14px calc(env(safe-area-inset-bottom) + 12px);
+    background:linear-gradient(transparent,var(--bg) 22%);pointer-events:none}
+  .bbar .inner{max-width:560px;margin:0 auto;display:flex;gap:10px;pointer-events:auto}
+  .btn{flex:1;height:54px;border:none;border-radius:var(--r);font-size:16px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--sans)}
+  .btn.primary{background:var(--hi);color:var(--on-hi)}
+  .btn.primary:active{background:var(--hi-press)}
+  .btn.ghost{flex:none;width:54px;background:var(--ink);color:#fff}
+  .btn:disabled{opacity:.5}
+  /* Empty / import */
+  .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:30px 26px 90px;gap:6px}
+  .center .mark{font:600 13px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+    color:var(--hi-press);margin-bottom:10px}
+  .center h1{font-size:26px;margin:0;font-weight:700;letter-spacing:-.01em}
+  .center p{color:var(--muted);margin:4px 0 0;max-width:32ch}
+  .center .actions{margin-top:24px;width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px}
+  .center .btn{width:100%}
+  .linkbtn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;
+    text-decoration:underline;text-underline-offset:3px;font-family:var(--sans);padding:8px}
+  /* Toast */
+  #toast{position:fixed;left:50%;bottom:90px;translate:-50% 0;
+    z-index:50;background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;
+    font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,translate .2s;
+    max-width:88%;text-align:center}
+  #toast.show{opacity:1;translate:-50% -10px}
+  .hidden{display:none !important}
+  /* Spinner */
+  .spin{width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;
+    border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* Photo source buttons */
+  .btn.camsec{flex:0 0 auto;width:auto;padding:0 16px;font-size:14px;background:var(--ink)}
+  /* Duplicate asset */
+  .dupbtn{width:100%;margin-top:14px;padding:13px;border:1px solid var(--line-strong);
+    background:var(--surface);color:var(--prog);border-radius:var(--r);font-size:15px;
+    font-weight:500;cursor:pointer;font-family:var(--sans)}
+  .dupbtn:active{background:var(--surface-2)}
+  .dup-tag{font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+    color:var(--hi-press)}
+  /* In-app camera */
+  .cam{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column}
+  .cam video{flex:1;width:100%;height:100%;object-fit:cover;background:#000}
+  .cam-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+    align-items:center;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;color:#fff}
+  .cam-top #cam-count{font:500 13px/1 var(--mono);background:rgba(0,0,0,.45);
+    padding:7px 11px;border-radius:999px}
+  .cam-x{width:40px;height:40px;border:none;border-radius:50%;background:rgba(0,0,0,.45);
+    color:#fff;font-size:17px;cursor:pointer}
+  .cam-strip{position:absolute;left:0;right:0;bottom:104px;display:flex;gap:6px;
+    padding:0 14px;overflow-x:auto}
+  .cam-strip img{width:52px;height:52px;object-fit:cover;border-radius:6px;
+    border:2px solid #fff;flex:none}
+  .cam-bar{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px calc(env(safe-area-inset-bottom) + 18px);
+    background:linear-gradient(transparent,rgba(0,0,0,.55))}
+  .cam-spacer{width:72px}
+  .cam-shutter{width:72px;height:72px;border-radius:50%;background:#fff;
+    border:4px solid rgba(255,255,255,.45);cursor:pointer}
+  .cam-shutter:active{transform:scale(.93)}
+  .cam-done{min-width:72px;color:#fff;background:var(--hi);border:none;border-radius:var(--r);
+    padding:13px 16px;font-weight:600;font-size:15px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- IMPORT SCREEN -->
+  <section id="screen-import" class="center">
+    <img class="brandbig" src="logo.png" alt="Auditor">
+    <div class="mark">Auditor · Site Capture</div>
+    <h1>Start with a field pack</h1>
+    <p>Load the pack exported from your desktop app to pull in this building's materials and the fields to capture.</p>
+    <div class="actions">
+      <button class="btn primary" id="btn-import">Import field pack</button>
+      <button class="linkbtn" id="btn-sample">Or try a sample building</button>
+    </div>
+  </section>
+
+  <!-- LIST SCREEN -->
+  <section id="screen-list" class="hidden" style="display:flex;flex-direction:column;flex:1">
+    <header>
+      <div class="hrow">
+        <img class="brand" src="logo.png" alt="Auditor">
+        <div class="htxt">
+          <div class="heyebrow">Site Capture</div>
+          <div class="hname" id="list-project">—</div>
+        </div>
+        <div class="pill" id="sync-pill"><span class="dot"></span><span id="sync-text">0 to sync</span></div>
+        <button class="iconbtn" id="btn-menu" aria-label="Options">⋯</button>
+      </div>
+    </header>
+    <div class="search"><input id="search" type="search" placeholder="Search materials, category or code" autocomplete="off"></div>
+    <main id="list-body"></main>
+    <div class="bbar"><div class="inner">
+      <button class="btn ghost" id="btn-help" aria-label="Help">?</button>
+      <button class="btn primary" id="btn-export">Export field data</button>
+    </div></div>
+  </section>
+
+  <!-- DETAIL SCREEN -->
+  <section id="screen-detail" class="hidden" style="display:flex;flex-direction:column;flex:1">
+    <header>
+      <div class="hrow">
+        <button class="iconbtn" id="btn-back" aria-label="Back">‹</button>
+        <div class="htxt">
+          <div class="heyebrow" id="detail-project">—</div>
+          <div class="hname" id="detail-head">Material</div>
+        </div>
+      </div>
+    </header>
+    <main id="detail-body"></main>
+    <div class="bbar"><div class="inner">
+      <button class="btn ghost camsec" id="btn-device">From device</button>
+      <button class="btn primary" id="btn-shoot">＋ Take photos</button>
+    </div></div>
+  </section>
+
+</div>
+
+<div id="cam" class="cam hidden">
+  <video id="cam-video" playsinline autoplay muted></video>
+  <div class="cam-top">
+    <span id="cam-count">0 photos</span>
+    <button id="cam-cancel" class="cam-x" aria-label="Close camera">✕</button>
+  </div>
+  <div id="cam-strip" class="cam-strip"></div>
+  <div class="cam-bar">
+    <span class="cam-spacer"></span>
+    <button id="cam-shutter" class="cam-shutter" aria-label="Take photo"></button>
+    <button id="cam-done" class="cam-done">Done</button>
+  </div>
+</div>
+
+<input id="file-pack" type="file" accept=".json,application/json" class="hidden">
+<input id="file-photo" type="file" accept="image/*" multiple class="hidden">
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- tiny DOM helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let toastTimer;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ---------- IndexedDB ---------- */
+const DB_NAME='FieldCaptureDB', DB_VER=1; let db;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VER);
+  r.onupgradeneeded=e=>{const d=e.target.result;
+    if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv',{keyPath:'k'});
+    if(!d.objectStoreNames.contains('captures'))d.createObjectStore('captures',{keyPath:'materialId'});
+    if(!d.objectStoreNames.contains('photos')){const ps=d.createObjectStore('photos',{keyPath:'id'});ps.createIndex('byMaterial','materialId',{unique:false});}};
+  r.onsuccess=()=>{db=r.result;res(db);}; r.onerror=()=>rej(r.error);});}
+const store=(n,m='readonly')=>db.transaction(n,m).objectStore(n);
+const px=req=>new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});
+const kvGet=async k=>{const r=await px(store('kv').get(k));return r?r.value:undefined;};
+const kvPut=(k,value)=>px(store('kv','readwrite').put({k,value}));
+const getCapture=id=>px(store('captures').get(id));
+const putCapture=c=>px(store('captures','readwrite').put(c));
+const allCaptures=()=>px(store('captures').getAll());
+const addPhoto=rec=>px(store('photos','readwrite').add(rec));
+const delPhoto=id=>px(store('photos','readwrite').delete(id));
+const allPhotos=()=>px(store('photos').getAll());
+function photosFor(id){return new Promise((res,rej)=>{const out=[];const c=store('photos').index('byMaterial').openCursor(IDBKeyRange.only(id));
+  c.onsuccess=e=>{const cur=e.target.result;if(cur){out.push(cur.value);cur.continue();}else res(out);};c.onerror=()=>rej(c.error);});}
+async function clearAll(){for(const s of ['kv','captures','photos'])await px(store(s,'readwrite').clear());}
+
+/* ---------- image + gps ---------- */
+function loadImg(file){return new Promise((res,rej)=>{const i=new Image();const u=URL.createObjectURL(file);
+  i.onload=()=>{URL.revokeObjectURL(u);res(i);};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('decode'));};i.src=u;});}
+async function compress(file,maxDim=2000,q=0.82){
+  let src;
+  try{src=await createImageBitmap(file,{imageOrientation:'from-image'});}
+  catch(_){src=await loadImg(file);}
+  const w=src.width,h=src.height,scale=Math.min(1,maxDim/Math.max(w,h));
+  const cw=Math.max(1,Math.round(w*scale)),ch=Math.max(1,Math.round(h*scale));
+  const cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
+  cv.getContext('2d').drawImage(src,0,0,cw,ch);
+  if(src.close)src.close();
+  return await new Promise(r=>cv.toBlob(r,'image/jpeg',q));
+}
+function getGPS(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
+  navigator.geolocation.getCurrentPosition(
+    p=>res({lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy)}),
+    ()=>res(null),{enableHighAccuracy:true,timeout:8000,maximumAge:60000});});}
+
+/* ---------- ZIP writer (store, no compression) ---------- */
+const CRC=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=CRC[(c^u8[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+const enc=s=>new TextEncoder().encode(s);
+function buildZip(files){
+  const d=new Date();
+  const tt=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xFFFF;
+  const dd=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF;
+  const chunks=[],central=[];let off=0;
+  for(const f of files){
+    const name=enc(f.name),data=f.data,crc=crc32(data);
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(10,tt,true);lh.setUint16(12,dd,true);
+    lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,name.length,true);
+    chunks.push(new Uint8Array(lh.buffer),name,data);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(12,tt,true);ch.setUint16(14,dd,true);
+    ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
+    central.push({h:new Uint8Array(ch.buffer),n:name});
+    off+=30+name.length+data.length;
+  }
+  const cdStart=off;let cdSize=0;
+  for(const c of central){chunks.push(c.h,c.n);cdSize+=c.h.length+c.n.length;}
+  const eo=new DataView(new ArrayBuffer(22));
+  eo.setUint32(0,0x06054b50,true);eo.setUint16(8,central.length,true);eo.setUint16(10,central.length,true);
+  eo.setUint32(12,cdSize,true);eo.setUint32(16,cdStart,true);
+  chunks.push(new Uint8Array(eo.buffer));
+  return new Blob(chunks,{type:'application/zip'});
+}
+
+/* ---------- app state ---------- */
+let pack=null, capCache={}, photoCounts={}, urlPool=[], collapsed={};
+function freeUrls(){urlPool.forEach(URL.revokeObjectURL);urlPool=[];}
+
+function show(id){['import','list','detail'].forEach(s=>$('#screen-'+s).classList.toggle('hidden',s!==id));}
+
+async function boot(){
+  await openDB();
+  pack=await kvGet('pack');
+  wire();
+  if(!navigator.onLine) document.documentElement.dataset.offline='1';
+  if(pack){await openList();} else {show('import');}
+  if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('sw.js');}catch(e){}}
+}
+
+/* ---------- list ---------- */
+async function refreshCaches(){
+  const caps=await allCaptures();capCache={};caps.forEach(c=>capCache[c.materialId]=c);
+  const ph=await allPhotos();photoCounts={};ph.forEach(p=>photoCounts[p.materialId]=(photoCounts[p.materialId]||0)+1);
+}
+function statusFor(id){
+  const c=capCache[id], n=photoCounts[id]||0;
+  if(c&&c.done) return 'done';
+  const hasF=c&&c.fields&&Object.values(c.fields).some(v=>v!==''&&v!=null);
+  if(n>0||hasF) return 'progress';
+  return 'todo';
+}
+async function openList(){
+  $('#list-project').textContent=pack.project.name||'Untitled project';
+  await refreshCaches();
+  renderList();
+  updateSync();
+  show('list');
+}
+function updateSync(){
+  let touched=0; for(const m of pack.materials){if(statusFor(m.id)!=='todo')touched++;}
+  const pill=$('#sync-pill');
+  pill.classList.toggle('clean',touched===0);
+  $('#sync-text').textContent = touched===0 ? 'nothing to sync' : touched+' to export';
+}
+function renderList(){
+  const q=$('#search').value.trim().toLowerCase();
+  const body=$('#list-body');body.innerHTML='';
+  const groups={};
+  for(const m of pack.materials){
+    if(q){const hay=(m.name+' '+(m.category||'')+' '+(m.ref_code||'')).toLowerCase();if(!hay.includes(q))continue;}
+    const g=m.category||'Uncategorised';(groups[g]=groups[g]||[]).push(m);
+  }
+  const keys=Object.keys(groups);
+  if(!keys.length){body.innerHTML='<div class="center" style="min-height:40vh"><p>No materials match "'+esc(q)+'".</p></div>';return;}
+  const searching=!!q;
+  for(const g of keys){
+    const done=groups[g].filter(m=>statusFor(m.id)==='done').length;
+    const isCollapsed = !searching && !!collapsed[g];
+    let html='<div class="group">'
+      +'<div class="glabel'+(isCollapsed?' collapsed':'')+'" data-group="'+esc(g)+'">'
+      +'<span class="gtitle"><span class="chev">\u25be</span>'+esc(g)+'</span>'
+      +'<span class="count">'+done+'/'+groups[g].length+'</span></div>';
+    if(!isCollapsed){
+      for(const m of groups[g]){
+        const st=statusFor(m.id), n=photoCounts[m.id]||0;
+        const stag = st==='done'?'<span class="stag t-done">Captured</span>': st==='progress'?'<span class="stag t-progress">In progress</span>':'<span class="stag">Not started</span>';
+        html+='<div class="card" data-id="'+esc(m.id)+'">'
+          +'<div class="spine s-'+st+'"></div>'
+          +'<div class="cbody"><div class="cname">'+esc(m.name)+'</div>'
+          +'<div class="cmeta">'+(m.is_duplicate?'<span class="dup-tag">copy</span>':'')+stag+'</div></div>'
+          +'<div class="cright"><span class="chip'+(n?'':' empty')+'">'+n+' \u25a6</span></div>'
+          +'</div>';
+      }
+    }
+    html+='</div>';body.insertAdjacentHTML('beforeend',html);
+  }
+}
+
+/* ---------- detail ---------- */
+let curId=null;
+async function openDetail(id){
+  curId=id; const m=pack.materials.find(x=>x.id===id); if(!m)return;
+  $('#detail-project').textContent=pack.project.name||'';
+  $('#detail-head').textContent=m.name;
+  let cap=capCache[id]; if(!cap){cap={materialId:id,fields:{},done:false};}
+  await renderDetail(m,cap);
+  show('detail');
+  window.scrollTo(0,0);
+}
+async function renderDetail(m,cap){
+  freeUrls();
+  const body=$('#detail-body');
+  let h='<div class="dhead">'+(m.category?'<div class="dcat">'+esc(m.category)+(m.subcategory?' · '+esc(m.subcategory):'')+'</div>':'')
+    +'<div class="dname">'+esc(m.name)+'</div></div>';
+
+  // fields
+  if(pack.capture_fields&&pack.capture_fields.length){
+    h+='<div class="sec"><h3>Field data</h3>';
+    for(const f of pack.capture_fields){
+      const val=(cap.fields&&cap.fields[f.key]!=null)?cap.fields[f.key]:'';
+      h+='<div class="field"><label>'+esc(f.label||f.key)+'</label>';
+      if(f.type==='select'){
+        h+='<div class="opts" data-key="'+esc(f.key)+'">';
+        for(const o of (f.options||[])){h+='<div class="opt'+(String(val)===String(o)?' sel':'')+'" data-val="'+esc(o)+'">'+esc(o)+'</div>';}
+        h+='</div>';
+      } else if(f.type==='textarea'){
+        h+='<textarea data-key="'+esc(f.key)+'" placeholder="'+esc(f.placeholder||'')+'">'+esc(val)+'</textarea>';
+      } else {
+        const t=f.type==='number'?'number':'text';
+        h+='<input type="'+t+'"'+(t==='number'?' inputmode="decimal"':'')+' data-key="'+esc(f.key)+'" value="'+esc(val)+'" placeholder="'+esc(f.placeholder||'')+'">';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+
+  // photos
+  const photos=(await photosFor(m.id)).sort((a,b)=>a.seq-b.seq);
+  h+='<div class="sec"><h3>Photos · '+photos.length+'</h3><div class="pgrid" id="pgrid">';
+  for(const p of photos){
+    const u=URL.createObjectURL(p.blob);urlPool.push(u);
+    const g=p.gps?('◉ '+p.gps.lat.toFixed(4)+', '+p.gps.lng.toFixed(4)):'◉ no fix';
+    h+='<div class="ptile"><img src="'+u+'" alt=""><button class="del" data-del="'+esc(p.id)+'" aria-label="Delete photo">✕</button><div class="gps">'+esc(g)+'</div></div>';
+  }
+  h+='<div class="padd" id="padd"><span class="plus">＋</span>Add photos</div>';
+  h+='</div></div>';
+
+  // done toggle
+  h+='<div class="donerow"><div><div class="lbl">Mark as captured</div><div class="sub">Flags this material as done for the report.</div></div>'
+    +'<label class="switch"><input type="checkbox" id="done-toggle"'+(cap.done?' checked':'')+'><span class="track"></span><span class="knob"></span></label></div>';
+
+  h+='<button class="dupbtn" id="btn-dup">Duplicate this asset</button>';
+
+  body.innerHTML=h;
+}
+
+async function saveField(key,val){
+  let cap=capCache[curId]||{materialId:curId,fields:{},done:false};
+  cap.fields=cap.fields||{}; cap.fields[key]=val;
+  capCache[curId]=cap; await putCapture(cap);
+}
+async function setDone(v){
+  let cap=capCache[curId]||{materialId:curId,fields:{},done:false};
+  cap.done=v; capCache[curId]=cap; await putCapture(cap);
+}
+
+/* ---------- photo capture ---------- */
+let shootBusy=false;
+
+async function persistPhotos(blobs){
+  // blobs are already-compressed JPEG Blobs
+  if(!blobs.length||shootBusy)return; shootBusy=true;
+  try{
+    const existing=await photosFor(curId);let seq=existing.reduce((mx,p)=>Math.max(mx,p.seq||0),0);
+    for(const blob of blobs){
+      const gps=await getGPS();
+      seq++;
+      await addPhoto({id:curId+'__'+Date.now()+'__'+Math.random().toString(36).slice(2,7),
+        materialId:curId,seq,ts:new Date().toISOString(),gps,blob});
+      photoCounts[curId]=(photoCounts[curId]||0)+1;
+    }
+    const m=pack.materials.find(x=>x.id===curId);
+    await renderDetail(m,capCache[curId]||{materialId:curId,fields:{},done:false});
+    toast(blobs.length>1?blobs.length+' photos added':'Photo added');
+  }catch(e){toast('Could not save photo');console.error(e);}
+  finally{shootBusy=false;}
+}
+
+async function onPhotos(files){
+  // From the device picker: compress each, then persist (cap a batch at 4)
+  if(!files.length)return;
+  if(files.length>4){toast('Up to 4 photos at a time — added the first 4');files=files.slice(0,4);}
+  const blobs=[];
+  for(const f of files){ try{ blobs.push(await compress(f)); }catch(_){ } }
+  await persistPhotos(blobs);
+}
+
+/* ---------- in-app camera (multi-shot) ---------- */
+let camStream=null, camShots=[];
+async function openCamera(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    $('#file-photo').click(); return;  // no live camera here -> fall back to picker
+  }
+  camShots=[];
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+  }catch(e){ toast('Camera unavailable — use From device'); return; }
+  const v=$('#cam-video'); v.srcObject=camStream;
+  $('#cam-strip').innerHTML=''; updateCamCount();
+  $('#cam').classList.remove('hidden');
+}
+function updateCamCount(){
+  $('#cam-count').textContent=camShots.length+(camShots.length===1?' photo':' photos');
+  $('#cam-done').textContent=camShots.length?('Done ('+camShots.length+')'):'Done';
+}
+async function camSnap(){
+  const v=$('#cam-video'); if(!v.videoWidth)return;
+  const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
+  const cw=Math.round(v.videoWidth*scale), ch=Math.round(v.videoHeight*scale);
+  const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+  cv.getContext('2d').drawImage(v,0,0,cw,ch);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82));
+  if(!blob)return;
+  camShots.push(blob);
+  const img=document.createElement('img'); img.src=URL.createObjectURL(blob);
+  const strip=$('#cam-strip'); strip.appendChild(img); strip.scrollLeft=strip.scrollWidth;
+  updateCamCount();
+}
+function closeCamera(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  $('#cam-video').srcObject=null;
+  $('#cam-strip').querySelectorAll('img').forEach(i=>URL.revokeObjectURL(i.src));
+  $('#cam-strip').innerHTML='';
+  $('#cam').classList.add('hidden');
+}
+async function camDone(){
+  const shots=camShots.slice(); closeCamera();
+  if(shots.length) await persistPhotos(shots);
+}
+
+/* ---------- duplicate an asset ---------- */
+async function duplicateAsset(id){
+  const src=pack.materials.find(m=>m.id===id); if(!src)return;
+  const names=new Set(pack.materials.map(m=>m.name));
+  const base=(src.name||'Asset').replace(/\s*\(\d+\)\s*$/,'');
+  let n=2, name=base+' ('+n+')';
+  while(names.has(name)){ n++; name=base+' ('+n+')'; }
+  const dup={id:src.id+'~dup-'+Date.now().toString(36),name:name,
+    category:src.category||'',subcategory:src.subcategory||'',ref_code:src.ref_code||'',
+    is_duplicate:true,duplicate_of:(src.duplicate_of||src.id)};
+  const idx=pack.materials.indexOf(src);
+  pack.materials.splice(idx+1,0,dup);
+  try{ await kvPut('pack',pack); }catch(e){ console.error(e); }
+  await refreshCaches();
+  toast('Duplicate created');
+  openDetail(dup.id);
+}
+
+/* ---------- export ---------- */
+function stamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());}
+async function shareOrDownload(blob,filename){
+  try{const file=new File([blob],filename,{type:'application/zip'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:filename});return;}}
+  catch(e){if(e&&e.name==='AbortError')return;}
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+async function exportData(){
+  const btn=$('#btn-export');const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Building…';
+  try{
+    await refreshCaches();
+    const photos=await allPhotos();const byMat={};photos.forEach(p=>{(byMat[p.materialId]=byMat[p.materialId]||[]).push(p);});
+    const files=[],out=[];
+    for(const m of pack.materials){
+      const cap=capCache[m.id];const ps=(byMat[m.id]||[]).sort((a,b)=>a.seq-b.seq);
+      if(!cap&&!ps.length)continue;
+      const stMap={todo:'not-started',progress:'in-progress',done:'completed'};
+      const photoOut=[];let i=0;
+      for(const p of ps){i++;const name='photos/'+m.id+'_'+i+'.jpg';
+        files.push({name,data:new Uint8Array(await p.blob.arrayBuffer())});
+        photoOut.push({file:name,ts:p.ts,gps:p.gps||null});}
+      out.push({id:m.id,name:m.name,category:m.category||'',subcategory:m.subcategory||'',
+        ref_code:m.ref_code||'',duplicate_of:m.duplicate_of||null,is_duplicate:!!m.is_duplicate,
+        fields:(cap&&cap.fields)||{},status:stMap[statusFor(m.id)],photos:photoOut});
+    }
+    if(!out.length){toast('Nothing captured yet');return;}
+    const data={format:'bca-fielddata',version:1,project_id:pack.project.id,project_name:pack.project.name,
+      captured_at:new Date().toISOString(),material_count:out.length,materials:out};
+    files.unshift({name:'data.json',data:enc(JSON.stringify(data,null,2))});
+    const zip=buildZip(files);
+    await shareOrDownload(zip,'fielddata_'+(pack.project.name||'project').replace(/[^a-z0-9]+/gi,'-').slice(0,40)+'_'+stamp()+'.zip');
+    toast('Exported '+out.length+' materials');
+  }catch(e){toast('Export failed');console.error(e);}
+  finally{btn.disabled=false;btn.innerHTML=orig;}
+}
+
+/* ---------- import ---------- */
+function validatePack(p){
+  if(!p||p.format!=='bca-fieldpack')throw new Error('This file is not a field pack.');
+  if(!p.project||!Array.isArray(p.materials))throw new Error('Field pack is missing project or materials.');
+  p.project.id=p.project.id||('proj-'+Date.now());
+  p.materials.forEach((m,i)=>{m.id=m.id||('m-'+(i+1));m.name=m.name||('Material '+(i+1));});
+  p.capture_fields=p.capture_fields||[];
+  return p;
+}
+async function loadPack(obj,{fresh}={}){
+  const p=validatePack(obj);
+  const prev=await kvGet('pack');
+  if(fresh||(prev&&prev.project&&prev.project.id!==p.project.id)){await clearAll();}
+  pack=p; await kvPut('pack',p);
+  await openList();
+  toast('Loaded '+p.materials.length+' materials');
+}
+
+/* ---------- sample pack ---------- */
+function samplePack(){
+  const cf=[
+    {key:'condition',label:'Condition',type:'select',options:['Good','Fair','Poor','Failed']},
+    {key:'rul',label:'Est. remaining life (yrs)',type:'number',placeholder:'e.g. 10'},
+    {key:'qty',label:'Approx. quantity',type:'text',placeholder:'e.g. 250 m²'},
+    {key:'notes',label:'Field notes',type:'textarea',placeholder:'Observations, defects, location…'}
+  ];
+  const mats=[
+    ['Roofing','Low-slope membrane','RF-01','Modified bitumen — main roof'],
+    ['Roofing','Flashing & parapets','RF-04','Metal cap flashing'],
+    ['Roofing','Roof drains','RF-07','Interior drains'],
+    ['Exterior walls','Cladding','EW-01','Brick veneer — north & east'],
+    ['Exterior walls','Sealants','EW-05','Perimeter window sealant'],
+    ['Exterior walls','Glazing','EW-08','Aluminium-framed windows'],
+    ['Mechanical','Heating','ME-01','Rooftop gas units (x3)'],
+    ['Mechanical','Domestic hot water','ME-04','Gas-fired water heater'],
+    ['Site & civil','Paving','SC-02','Asphalt parking lot'],
+    ['Site & civil','Site lighting','SC-06','Pole-mounted LED fixtures']
+  ];
+  return {format:'bca-fieldpack',version:1,
+    project:{id:'sample-123-main',name:'123 Main St — sample',details:{Client:'Demo Holdings',"Site ID":'S-0042',"Building Name":'Main St Office'}},
+    capture_fields:cf,
+    materials:mats.map((m,i)=>({id:'m-'+String(i+1).padStart(3,'0'),category:m[0],subcategory:m[1],ref_code:m[2],name:m[3]}))};
+}
+
+/* ---------- wiring ---------- */
+function wire(){
+  $('#btn-import').onclick=()=>$('#file-pack').click();
+  $('#btn-sample').onclick=()=>loadPack(samplePack(),{fresh:true});
+  $('#file-pack').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    try{const txt=await f.text();await loadPack(JSON.parse(txt));}catch(err){toast(err.message||'Could not read that file');}};
+
+  $('#search').oninput=()=>renderList();
+  $('#btn-export').onclick=exportData;
+  $('#btn-back').onclick=()=>{openList();};
+  $('#btn-shoot').onclick=openCamera;
+  $('#btn-device').onclick=()=>$('#file-photo').click();
+  $('#file-photo').onchange=e=>{const fs=[...e.target.files];e.target.value='';onPhotos(fs);};
+  $('#cam-shutter').onclick=camSnap;
+  $('#cam-done').onclick=camDone;
+  $('#cam-cancel').onclick=closeCamera;
+
+  $('#btn-help').onclick=()=>toast('Pick a material, shoot photos, fill the fields. Export when you have signal.');
+  $('#btn-menu').onclick=async()=>{
+    if(confirm('Reset this device? This clears the loaded pack and all captured photos and data on this phone.')){
+      await clearAll();pack=null;freeUrls();show('import');toast('Device cleared');}
+  };
+
+  // list: open material
+  $('#list-body').addEventListener('click',e=>{
+    const gl=e.target.closest('.glabel');
+    if(gl){const g=gl.dataset.group;collapsed[g]=!collapsed[g];renderList();return;}
+    const c=e.target.closest('.card');if(c)openDetail(c.dataset.id);
+  });
+
+  // detail: delegated inputs
+  const body=$('#detail-body');
+  body.addEventListener('click',e=>{
+    const opt=e.target.closest('.opt');
+    if(opt){const wrap=opt.closest('.opts');const cur=wrap.querySelector('.opt.sel');
+      const same=cur===opt;
+      if(cur)cur.classList.remove('sel');
+      if(!same){opt.classList.add('sel');saveField(wrap.dataset.key,opt.dataset.val);}
+      else saveField(wrap.dataset.key,'');
+      return;}
+    const del=e.target.closest('.del');
+    if(del){if(confirm('Delete this photo?'))removePhoto(del.dataset.del);return;}
+    const add=e.target.closest('#padd');
+    if(add){openCamera();return;}
+    if(e.target.id==='btn-dup'){duplicateAsset(curId);return;}
+  });
+  let typingTimer;
+  body.addEventListener('input',e=>{const el=e.target;if(!el.dataset.key)return;
+    clearTimeout(typingTimer);typingTimer=setTimeout(()=>saveField(el.dataset.key,el.value),300);});
+  body.addEventListener('change',e=>{if(e.target.id==='done-toggle')setDone(e.target.checked);});
+}
+
+async function removePhoto(pid){
+  await delPhoto(pid);
+  photoCounts[curId]=Math.max(0,(photoCounts[curId]||1)-1);
+  const m=pack.materials.find(x=>x.id===curId);
+  await renderDetail(m,capCache[curId]||{materialId:curId,fields:{},done:false});
+  toast('Photo deleted');
+}
+
+window.addEventListener('online',()=>{const p=$('#sync-pill');});
+boot().catch(e=>{document.body.innerHTML='<div class="center"><h1>Storage unavailable</h1><p>This browser blocked local storage. Open the app in a normal (non-private) tab over https.</p></div>';console.error(e);});
+</script>
+</body>
+</html>

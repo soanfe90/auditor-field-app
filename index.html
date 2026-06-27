@@ -69,7 +69,7 @@
   .glabel .gtitle{display:flex;align-items:center;gap:7px}
   .glabel .chev{display:inline-block;font-size:12px;color:var(--faint);transition:transform .15s}
   .glabel.collapsed .chev{transform:rotate(-90deg)}
-  /* Material card */
+  /* Card (asset / project) */
   .card{display:flex;align-items:stretch;gap:0;background:var(--surface);
     border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden;
     cursor:pointer;transition:transform .04s ease}
@@ -78,7 +78,7 @@
   .spine.s-progress{background:var(--prog)} .spine.s-done{background:var(--done)}
   .cbody{flex:1;min-width:0;padding:13px 14px}
   .cname{font-weight:600;font-size:16px;line-height:1.25}
-  .cmeta{display:flex;gap:8px;align-items:center;margin-top:5px;color:var(--muted);font-size:13px}
+  .cmeta{display:flex;gap:8px;align-items:center;margin-top:5px;color:var(--muted);font-size:13px;flex-wrap:wrap}
   .ref{font:500 12px/1 var(--mono);color:var(--muted);background:var(--surface-2);
     border:1px solid var(--line);padding:3px 7px;border-radius:5px}
   .cright{flex:none;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
@@ -88,6 +88,7 @@
   .chip.empty{color:var(--faint)}
   .stag{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
   .stag.t-progress{color:var(--prog)} .stag.t-done{color:var(--done)}
+  .stag.t-unknown{color:var(--hi-press)}
   /* Detail */
   .dhead{padding:6px 2px 4px}
   .dcat{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -110,34 +111,22 @@
     background:var(--surface-2);color:var(--text);border-radius:var(--r-sm);padding:11px 8px;
     font-size:15px;font-weight:500;cursor:pointer;user-select:none}
   .opt.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
-  /* Photo grid */
-  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .ptile{position:relative;aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;
-    background:var(--surface-2);border:1px solid var(--line)}
-  .ptile img{width:100%;height:100%;object-fit:cover;display:block}
-  .ptile .gps{position:absolute;left:0;right:0;bottom:0;font:500 9px/1.2 var(--mono);
-    color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:10px 5px 4px;
-    display:flex;align-items:center;gap:3px}
-  .ptile .del{position:absolute;top:4px;right:4px;width:26px;height:26px;border:none;
-    border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font-size:14px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center}
-  .padd{aspect-ratio:1;border:1.5px dashed var(--line-strong);border-radius:var(--r-sm);
-    background:var(--surface-2);color:var(--muted);display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500}
-  .padd .plus{font-size:26px;line-height:1;color:var(--hi-press)}
-  /* Done toggle row */
-  .donerow{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-    padding:14px;margin-top:14px}
-  .donerow .lbl{font-weight:500}
-  .donerow .sub{font-size:13px;color:var(--muted);margin-top:2px}
-  .switch{position:relative;width:52px;height:30px;flex:none}
-  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
-  .switch .track{position:absolute;inset:0;background:var(--line-strong);border-radius:999px;transition:background .15s}
-  .switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;
-    border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
-  .switch input:checked ~ .track{background:var(--done)}
-  .switch input:checked ~ .knob{transform:translateX(22px)}
+  /* Photo grid / capture cards */
+  .capcard{display:flex;gap:12px;border:1px solid var(--line);border-radius:var(--r);
+    padding:10px;margin-top:12px;background:var(--surface-2)}
+  .capcard .thumb{width:96px;height:96px;flex:none;border-radius:var(--r-sm);overflow:hidden;
+    background:var(--surface);border:1px solid var(--line);position:relative}
+  .capcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .capcard .thumb .nophoto{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    color:var(--faint);font-size:24px}
+  .capcard .cfields{flex:1;min-width:0}
+  .capcard .crow{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .capcard .cgps{font:500 10px/1.2 var(--mono);color:var(--muted)}
+  .capcard .cdel{border:none;background:none;color:var(--danger);font-size:13px;cursor:pointer;padding:2px 4px}
+  .padd{margin-top:14px;width:100%;border:1.5px dashed var(--line-strong);border-radius:var(--r);
+    background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center;
+    gap:8px;cursor:pointer;font-size:15px;font-weight:500;padding:16px}
+  .padd .plus{font-size:22px;line-height:1;color:var(--hi-press)}
   /* Bottom bar */
   .bbar{position:fixed;left:0;right:0;bottom:0;z-index:30;
     padding:10px 14px calc(env(safe-area-inset-bottom) + 12px);
@@ -148,8 +137,9 @@
   .btn.primary{background:var(--hi);color:var(--on-hi)}
   .btn.primary:active{background:var(--hi-press)}
   .btn.ghost{flex:none;width:54px;background:var(--ink);color:#fff}
+  .btn.wide{flex:1}
   .btn:disabled{opacity:.5}
-  /* Empty / import */
+  /* Empty / center */
   .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;padding:30px 26px 90px;gap:6px}
   .center .mark{font:600 13px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;
@@ -160,9 +150,18 @@
   .center .btn{width:100%}
   .linkbtn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;
     text-decoration:underline;text-underline-offset:3px;font-family:var(--sans);padding:8px}
+  /* Template option list (new project) */
+  .optlist{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .optrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r);padding:14px;cursor:pointer;text-align:left}
+  .optrow:active{background:var(--surface-2)}
+  .optrow .ot{flex:1;min-width:0}
+  .optrow .otitle{font-weight:600}
+  .optrow .osub{font-size:13px;color:var(--muted);margin-top:2px}
+  .optrow .odel{border:none;background:none;color:var(--danger);font-size:13px;cursor:pointer}
   /* Toast */
   #toast{position:fixed;left:50%;bottom:90px;translate:-50% 0;
-    z-index:50;background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;
+    z-index:200;background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;
     font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,translate .2s;
     max-width:88%;text-align:center}
   #toast.show{opacity:1;translate:-50% -10px}
@@ -171,106 +170,185 @@
   .spin{width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;
     border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
   @keyframes sp{to{transform:rotate(360deg)}}
-  /* Photo source buttons */
-  .btn.camsec{flex:0 0 auto;width:auto;padding:0 16px;font-size:14px;background:var(--ink)}
-  /* Duplicate asset */
-  .dupbtn{width:100%;margin-top:14px;padding:13px;border:1px solid var(--line-strong);
-    background:var(--surface);color:var(--prog);border-radius:var(--r);font-size:15px;
-    font-weight:500;cursor:pointer;font-family:var(--sans)}
-  .dupbtn:active{background:var(--surface-2)}
-  .dup-tag{font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
-    color:var(--hi-press)}
-  /* In-app camera */
-  .cam{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column}
-  .cam video{flex:1;width:100%;height:100%;object-fit:cover;background:#000}
-  .cam-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
-    align-items:center;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;color:#fff}
-  .cam-top #cam-count{font:500 13px/1 var(--mono);background:rgba(0,0,0,.45);
-    padding:7px 11px;border-radius:999px}
-  .cam-x{width:40px;height:40px;border:none;border-radius:50%;background:rgba(0,0,0,.45);
-    color:#fff;font-size:17px;cursor:pointer}
-  .cam-strip{position:absolute;left:0;right:0;bottom:104px;display:flex;gap:6px;
-    padding:0 14px;overflow-x:auto}
-  .cam-strip img{width:52px;height:52px;object-fit:cover;border-radius:6px;
-    border:2px solid #fff;flex:none}
-  .cam-bar{display:flex;align-items:center;justify-content:space-between;
-    padding:16px 24px calc(env(safe-area-inset-bottom) + 18px);
+  /* checkbox for batch export */
+  .selbox{width:24px;height:24px;flex:none;border:2px solid var(--line-strong);border-radius:6px;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+  .selbox.on{background:var(--hi);border-color:var(--hi)}
+
+  /* ===================== Data Collector (camera-first) ===================== */
+  .collector{position:fixed;inset:0;z-index:120;background:#000;display:flex;flex-direction:column;overflow:hidden}
+  .collector video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+  .col-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;gap:10px;
+    padding:calc(env(safe-area-inset-top) + 10px) 14px 10px}
+  .col-x{width:40px;height:40px;border:none;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;
+    font-size:17px;cursor:pointer;flex:none}
+  .col-tag{flex:1;min-width:0;background:rgba(0,0,0,.5);color:#fff;border-radius:999px;padding:9px 14px;
+    font:500 13px/1.2 var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .col-tag b{color:var(--hi)}
+  .col-count{background:rgba(0,0,0,.5);color:#fff;border-radius:999px;padding:9px 12px;
+    font:500 12px/1 var(--mono);flex:none}
+  /* category rail */
+  .col-rail{position:absolute;left:0;top:0;bottom:0;z-index:2;width:118px;
+    padding:calc(env(safe-area-inset-top) + 64px) 8px calc(env(safe-area-inset-bottom) + 110px) 10px;
+    overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+    background:linear-gradient(90deg,rgba(0,0,0,.55),transparent)}
+  .col-cat{border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#fff;
+    border-radius:10px;padding:10px 9px;font-size:13px;font-weight:600;text-align:left;cursor:pointer;line-height:1.2}
+  .col-cat.sel{background:var(--ink);border-color:var(--hi)}
+  .col-cat .cc-n{display:block;font:500 10px/1 var(--mono);color:var(--hi);margin-top:4px}
+  /* asset search panel */
+  .col-assetbar{position:absolute;left:128px;right:14px;top:calc(env(safe-area-inset-top) + 60px);z-index:3}
+  .col-assetbar input{width:100%;height:42px;border:none;border-radius:10px;padding:0 12px;font-size:15px;
+    background:rgba(255,255,255,.95);color:#0F172A}
+  .col-assetlist{margin-top:6px;max-height:40vh;overflow-y:auto;background:rgba(255,255,255,.97);
+    border-radius:10px;display:none}
+  .col-assetlist.show{display:block}
+  .col-aitem{padding:11px 12px;font-size:14px;color:#0F172A;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}
+  .col-aitem:last-child{border-bottom:none}
+  .col-aitem.unk{color:var(--hi-press);font-weight:600}
+  .col-aitem.sel{background:#eef2ff}
+  /* shutter bar */
+  .col-bar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;
+    justify-content:center;padding:14px 24px calc(env(safe-area-inset-bottom) + 18px);
     background:linear-gradient(transparent,rgba(0,0,0,.55))}
-  .cam-spacer{width:72px}
-  .cam-shutter{width:72px;height:72px;border-radius:50%;background:#fff;
+  .col-shutter{width:74px;height:74px;border-radius:50%;background:#fff;
     border:4px solid rgba(255,255,255,.45);cursor:pointer}
-  .cam-shutter:active{transform:scale(.93)}
-  .cam-done{min-width:72px;color:#fff;background:var(--hi);border:none;border-radius:var(--r);
-    padding:13px 16px;font-weight:600;font-size:15px;cursor:pointer}
+  .col-shutter:active{transform:scale(.93)}
+  .col-shutter.armed{border-color:var(--hi);box-shadow:0 0 0 3px rgba(234,88,12,.5)}
+  /* fields popout (after a shot) */
+  .col-pop{position:absolute;left:0;right:0;bottom:0;z-index:5;max-height:74vh;overflow-y:auto;
+    background:var(--surface);border-top-left-radius:18px;border-top-right-radius:18px;
+    padding:16px 16px calc(env(safe-area-inset-bottom) + 90px);transform:translateY(100%);
+    transition:transform .18s ease;box-shadow:0 -8px 30px rgba(0,0,0,.4)}
+  .col-pop.show{transform:translateY(0)}
+  .col-pop .pophead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .col-pop .popthumb{width:54px;height:54px;border-radius:8px;object-fit:cover;flex:none;border:1px solid var(--line)}
+  .col-pop .poptitle{flex:1;min-width:0}
+  .col-pop .poptitle .pt1{font-weight:700;font-size:15px}
+  .col-pop .poptitle .pt2{font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .col-popbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;gap:10px;
+    padding:10px 16px calc(env(safe-area-inset-bottom) + 14px);background:var(--surface);
+    border-top:1px solid var(--line)}
+  .col-popbar.show{display:flex}
+  .col-popbar.hide{display:none}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- IMPORT SCREEN -->
-  <section id="screen-import" class="center">
-    <img class="brandbig" src="logo.png" alt="Auditor">
-    <div class="mark">Auditor · Site Capture</div>
-    <h1>Start with a field pack</h1>
-    <p>Load the pack exported from your desktop app to pull in this building's materials and the fields to capture.</p>
-    <div class="actions">
-      <button class="btn primary" id="btn-import">Import field pack</button>
-      <button class="linkbtn" id="btn-sample">Or try a sample building</button>
-    </div>
-  </section>
-
-  <!-- LIST SCREEN -->
-  <section id="screen-list" class="hidden" style="display:flex;flex-direction:column;flex:1">
+  <!-- ===================== DASHBOARD ===================== -->
+  <section id="screen-dashboard" class="hidden" style="display:flex;flex-direction:column;flex:1">
     <header>
       <div class="hrow">
         <img class="brand" src="logo.png" alt="Auditor">
         <div class="htxt">
           <div class="heyebrow">Site Capture</div>
-          <div class="hname" id="list-project">—</div>
+          <div class="hname">Projects</div>
         </div>
-        <div class="pill" id="sync-pill"><span class="dot"></span><span id="sync-text">0 to sync</span></div>
-        <button class="iconbtn" id="btn-menu" aria-label="Options">⋯</button>
+        <button class="iconbtn" id="dash-select" aria-label="Select for export">⬚</button>
+        <button class="iconbtn" id="dash-menu" aria-label="Options">⋯</button>
       </div>
     </header>
-    <div class="search"><input id="search" type="search" placeholder="Search materials, category or code" autocomplete="off"></div>
-    <main id="list-body"></main>
-    <div class="bbar"><div class="inner">
-      <button class="btn ghost" id="btn-help" aria-label="Help">?</button>
-      <button class="btn primary" id="btn-export">Export field data</button>
+    <main id="dash-body"></main>
+    <div class="bbar"><div class="inner" id="dash-bar">
+      <button class="btn primary" id="btn-new-project">＋ New project</button>
     </div></div>
   </section>
 
-  <!-- DETAIL SCREEN -->
-  <section id="screen-detail" class="hidden" style="display:flex;flex-direction:column;flex:1">
+  <!-- ===================== NEW PROJECT (choose template) ===================== -->
+  <section id="screen-newproject" class="hidden" style="display:flex;flex-direction:column;flex:1">
     <header>
       <div class="hrow">
-        <button class="iconbtn" id="btn-back" aria-label="Back">‹</button>
-        <div class="htxt">
-          <div class="heyebrow" id="detail-project">—</div>
-          <div class="hname" id="detail-head">Material</div>
-        </div>
+        <button class="iconbtn" id="np-back" aria-label="Back">‹</button>
+        <div class="htxt"><div class="heyebrow">New project</div><div class="hname">Choose a template</div></div>
       </div>
     </header>
-    <main id="detail-body"></main>
+    <main>
+      <div class="sec">
+        <h3>Start from</h3>
+        <button class="btn primary" id="np-import" style="width:100%">Import a template pack</button>
+        <p style="color:var(--muted);font-size:13px;margin:10px 2px 0">A template pack is exported from the desktop Auditor app.</p>
+      </div>
+      <div class="sec">
+        <h3>Saved templates</h3>
+        <div id="np-templates" class="optlist"></div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ===================== PROJECT INFO FORM ===================== -->
+  <section id="screen-info" class="hidden" style="display:flex;flex-direction:column;flex:1">
+    <header>
+      <div class="hrow">
+        <button class="iconbtn" id="info-back" aria-label="Back">‹</button>
+        <div class="htxt"><div class="heyebrow" id="info-eyebrow">Project information</div><div class="hname" id="info-tmpl">—</div></div>
+      </div>
+    </header>
+    <main><div class="sec" id="info-body"></div></main>
     <div class="bbar"><div class="inner">
-      <button class="btn ghost camsec" id="btn-device">From device</button>
-      <button class="btn primary" id="btn-shoot">＋ Take photos</button>
+      <button class="btn primary" id="info-save">Create project</button>
+    </div></div>
+  </section>
+
+  <!-- ===================== PROJECT PANEL (categories / assets) ===================== -->
+  <section id="screen-panel" class="hidden" style="display:flex;flex-direction:column;flex:1">
+    <header>
+      <div class="hrow">
+        <button class="iconbtn" id="panel-back" aria-label="Back">‹</button>
+        <div class="htxt"><div class="heyebrow">Site Capture</div><div class="hname" id="panel-project">—</div></div>
+        <div class="pill" id="panel-pill"><span class="dot"></span><span id="panel-sync">0 captured</span></div>
+        <button class="iconbtn" id="panel-menu" aria-label="Options">⋯</button>
+      </div>
+    </header>
+    <div class="search"><input id="panel-search" type="search" placeholder="Search assets, category or code" autocomplete="off"></div>
+    <main id="panel-body"></main>
+    <div class="bbar"><div class="inner">
+      <button class="btn ghost" id="panel-info" aria-label="Project info">ⓘ</button>
+      <button class="btn primary" id="btn-collector">◉ Data Collector</button>
+    </div></div>
+  </section>
+
+  <!-- ===================== ASSET / BUCKET REVIEW ===================== -->
+  <section id="screen-asset" class="hidden" style="display:flex;flex-direction:column;flex:1">
+    <header>
+      <div class="hrow">
+        <button class="iconbtn" id="asset-back" aria-label="Back">‹</button>
+        <div class="htxt"><div class="heyebrow" id="asset-eyebrow">—</div><div class="hname" id="asset-head">Asset</div></div>
+      </div>
+    </header>
+    <main id="asset-body"></main>
+    <div class="bbar"><div class="inner">
+      <button class="btn ghost camsec" id="asset-device" style="flex:none;width:auto;padding:0 16px;font-size:14px;background:var(--ink)">From device</button>
+      <button class="btn primary" id="asset-shoot">＋ Take photo</button>
     </div></div>
   </section>
 
 </div>
 
-<div id="cam" class="cam hidden">
-  <video id="cam-video" playsinline autoplay muted></video>
-  <div class="cam-top">
-    <span id="cam-count">0 photos</span>
-    <button id="cam-cancel" class="cam-x" aria-label="Close camera">✕</button>
+<!-- ===================== DATA COLLECTOR overlay ===================== -->
+<div id="collector" class="collector hidden">
+  <video id="col-video" playsinline autoplay muted></video>
+  <div class="col-top">
+    <button id="col-close" class="col-x" aria-label="Close">✕</button>
+    <div id="col-tag" class="col-tag">Pick a category</div>
+    <div id="col-count" class="col-count">0</div>
   </div>
-  <div id="cam-strip" class="cam-strip"></div>
-  <div class="cam-bar">
-    <span class="cam-spacer"></span>
-    <button id="cam-shutter" class="cam-shutter" aria-label="Take photo"></button>
-    <button id="cam-done" class="cam-done">Done</button>
+  <div id="col-rail" class="col-rail"></div>
+  <div id="col-assetbar" class="col-assetbar hidden">
+    <input id="col-assetsearch" type="search" placeholder="Search asset to assign…" autocomplete="off">
+    <div id="col-assetlist" class="col-assetlist"></div>
+  </div>
+  <div class="col-bar"><button id="col-shutter" class="col-shutter" aria-label="Take photo"></button></div>
+  <div id="col-pop" class="col-pop">
+    <div class="pophead">
+      <img id="col-popthumb" class="popthumb" alt="">
+      <div class="poptitle"><div class="pt1" id="col-poptitle">Photo</div><div class="pt2" id="col-popsub">—</div></div>
+    </div>
+    <div id="col-popfields"></div>
+  </div>
+  <div id="col-popbar" class="col-popbar hide">
+    <button class="btn ghost" id="col-popdel" style="flex:none;width:54px;background:var(--danger)">🗑</button>
+    <button class="btn primary" id="col-popnext">Next photo ▸</button>
   </div>
 </div>
 
@@ -282,44 +360,49 @@
 "use strict";
 /* ---------- tiny DOM helpers ---------- */
 const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => String(s==null?'':s).trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'x';
+const uid = p => (p||'')+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 let toastTimer;
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);}
 
-/* ---------- IndexedDB ---------- */
-const DB_NAME='FieldCaptureDB', DB_VER=1; let db;
+/* ---------- IndexedDB v2 ---------- */
+const DB_NAME='FieldCaptureDB', DB_VER=2; let db;
 function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VER);
   r.onupgradeneeded=e=>{const d=e.target.result;
     if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv',{keyPath:'k'});
-    if(!d.objectStoreNames.contains('captures'))d.createObjectStore('captures',{keyPath:'materialId'});
-    if(!d.objectStoreNames.contains('photos')){const ps=d.createObjectStore('photos',{keyPath:'id'});ps.createIndex('byMaterial','materialId',{unique:false});}};
+    if(!d.objectStoreNames.contains('tmpl'))d.createObjectStore('tmpl',{keyPath:'id'});
+    if(!d.objectStoreNames.contains('proj'))d.createObjectStore('proj',{keyPath:'id'});
+    if(!d.objectStoreNames.contains('cap')){const cs=d.createObjectStore('cap',{keyPath:'id'});cs.createIndex('byProject','projectId',{unique:false});}
+    if(!d.objectStoreNames.contains('pic')){const ps=d.createObjectStore('pic',{keyPath:'id'});ps.createIndex('byProject','projectId',{unique:false});ps.createIndex('byCapture','captureId',{unique:false});}
+    // v1 stores ('captures','photos') are left intact for one-time migration on boot.
+  };
   r.onsuccess=()=>{db=r.result;res(db);}; r.onerror=()=>rej(r.error);});}
 const store=(n,m='readonly')=>db.transaction(n,m).objectStore(n);
 const px=req=>new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});
 const kvGet=async k=>{const r=await px(store('kv').get(k));return r?r.value:undefined;};
 const kvPut=(k,value)=>px(store('kv','readwrite').put({k,value}));
-const getCapture=id=>px(store('captures').get(id));
-const putCapture=c=>px(store('captures','readwrite').put(c));
-const allCaptures=()=>px(store('captures').getAll());
-const addPhoto=rec=>px(store('photos','readwrite').add(rec));
-const delPhoto=id=>px(store('photos','readwrite').delete(id));
-const allPhotos=()=>px(store('photos').getAll());
-function photosFor(id){return new Promise((res,rej)=>{const out=[];const c=store('photos').index('byMaterial').openCursor(IDBKeyRange.only(id));
+const allOf=n=>px(store(n).getAll());
+const getOf=(n,id)=>px(store(n).get(id));
+const putOf=(n,v)=>px(store(n,'readwrite').put(v));
+const delOf=(n,id)=>px(store(n,'readwrite').delete(id));
+function byIndex(storeName,index,key){return new Promise((res,rej)=>{const out=[];
+  const c=store(storeName).index(index).openCursor(IDBKeyRange.only(key));
   c.onsuccess=e=>{const cur=e.target.result;if(cur){out.push(cur.value);cur.continue();}else res(out);};c.onerror=()=>rej(c.error);});}
-async function clearAll(){for(const s of ['kv','captures','photos'])await px(store(s,'readwrite').clear());}
+const capturesForProject=pid=>byIndex('cap','byProject',pid);
+const photosForProject=pid=>byIndex('pic','byProject',pid);
+const photosForCapture=cid=>byIndex('pic','byCapture',cid);
 
-/* ---------- image + gps ---------- */
+/* ---------- image + gps (unchanged from v1) ---------- */
 function loadImg(file){return new Promise((res,rej)=>{const i=new Image();const u=URL.createObjectURL(file);
   i.onload=()=>{URL.revokeObjectURL(u);res(i);};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('decode'));};i.src=u;});}
 async function compress(file,maxDim=2000,q=0.82){
-  let src;
-  try{src=await createImageBitmap(file,{imageOrientation:'from-image'});}
-  catch(_){src=await loadImg(file);}
+  let src; try{src=await createImageBitmap(file,{imageOrientation:'from-image'});}catch(_){src=await loadImg(file);}
   const w=src.width,h=src.height,scale=Math.min(1,maxDim/Math.max(w,h));
   const cw=Math.max(1,Math.round(w*scale)),ch=Math.max(1,Math.round(h*scale));
   const cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
-  cv.getContext('2d').drawImage(src,0,0,cw,ch);
-  if(src.close)src.close();
+  cv.getContext('2d').drawImage(src,0,0,cw,ch); if(src.close)src.close();
   return await new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 }
 function getGPS(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
@@ -356,242 +439,6 @@ function buildZip(files){
   chunks.push(new Uint8Array(eo.buffer));
   return new Blob(chunks,{type:'application/zip'});
 }
-
-/* ---------- app state ---------- */
-let pack=null, capCache={}, photoCounts={}, urlPool=[], collapsed={};
-function freeUrls(){urlPool.forEach(URL.revokeObjectURL);urlPool=[];}
-
-function show(id){['import','list','detail'].forEach(s=>$('#screen-'+s).classList.toggle('hidden',s!==id));}
-
-async function boot(){
-  await openDB();
-  pack=await kvGet('pack');
-  wire();
-  if(!navigator.onLine) document.documentElement.dataset.offline='1';
-  if(pack){await openList();} else {show('import');}
-  if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('sw.js');}catch(e){}}
-}
-
-/* ---------- list ---------- */
-async function refreshCaches(){
-  const caps=await allCaptures();capCache={};caps.forEach(c=>capCache[c.materialId]=c);
-  const ph=await allPhotos();photoCounts={};ph.forEach(p=>photoCounts[p.materialId]=(photoCounts[p.materialId]||0)+1);
-}
-function statusFor(id){
-  const c=capCache[id], n=photoCounts[id]||0;
-  if(c&&c.done) return 'done';
-  const hasF=c&&c.fields&&Object.values(c.fields).some(v=>v!==''&&v!=null);
-  if(n>0||hasF) return 'progress';
-  return 'todo';
-}
-async function openList(){
-  $('#list-project').textContent=pack.project.name||'Untitled project';
-  await refreshCaches();
-  renderList();
-  updateSync();
-  show('list');
-}
-function updateSync(){
-  let touched=0; for(const m of pack.materials){if(statusFor(m.id)!=='todo')touched++;}
-  const pill=$('#sync-pill');
-  pill.classList.toggle('clean',touched===0);
-  $('#sync-text').textContent = touched===0 ? 'nothing to sync' : touched+' to export';
-}
-function renderList(){
-  const q=$('#search').value.trim().toLowerCase();
-  const body=$('#list-body');body.innerHTML='';
-  const groups={};
-  for(const m of pack.materials){
-    if(q){const hay=(m.name+' '+(m.category||'')+' '+(m.ref_code||'')).toLowerCase();if(!hay.includes(q))continue;}
-    const g=m.category||'Uncategorised';(groups[g]=groups[g]||[]).push(m);
-  }
-  const keys=Object.keys(groups);
-  if(!keys.length){body.innerHTML='<div class="center" style="min-height:40vh"><p>No materials match "'+esc(q)+'".</p></div>';return;}
-  const searching=!!q;
-  for(const g of keys){
-    const done=groups[g].filter(m=>statusFor(m.id)==='done').length;
-    const isCollapsed = !searching && !!collapsed[g];
-    let html='<div class="group">'
-      +'<div class="glabel'+(isCollapsed?' collapsed':'')+'" data-group="'+esc(g)+'">'
-      +'<span class="gtitle"><span class="chev">\u25be</span>'+esc(g)+'</span>'
-      +'<span class="count">'+done+'/'+groups[g].length+'</span></div>';
-    if(!isCollapsed){
-      for(const m of groups[g]){
-        const st=statusFor(m.id), n=photoCounts[m.id]||0;
-        const stag = st==='done'?'<span class="stag t-done">Captured</span>': st==='progress'?'<span class="stag t-progress">In progress</span>':'<span class="stag">Not started</span>';
-        html+='<div class="card" data-id="'+esc(m.id)+'">'
-          +'<div class="spine s-'+st+'"></div>'
-          +'<div class="cbody"><div class="cname">'+esc(m.name)+'</div>'
-          +'<div class="cmeta">'+(m.is_duplicate?'<span class="dup-tag">copy</span>':'')+stag+'</div></div>'
-          +'<div class="cright"><span class="chip'+(n?'':' empty')+'">'+n+' \u25a6</span></div>'
-          +'</div>';
-      }
-    }
-    html+='</div>';body.insertAdjacentHTML('beforeend',html);
-  }
-}
-
-/* ---------- detail ---------- */
-let curId=null;
-async function openDetail(id){
-  curId=id; const m=pack.materials.find(x=>x.id===id); if(!m)return;
-  $('#detail-project').textContent=pack.project.name||'';
-  $('#detail-head').textContent=m.name;
-  let cap=capCache[id]; if(!cap){cap={materialId:id,fields:{},done:false};}
-  await renderDetail(m,cap);
-  show('detail');
-  window.scrollTo(0,0);
-}
-async function renderDetail(m,cap){
-  freeUrls();
-  const body=$('#detail-body');
-  let h='<div class="dhead">'+(m.category?'<div class="dcat">'+esc(m.category)+(m.subcategory?' · '+esc(m.subcategory):'')+'</div>':'')
-    +'<div class="dname">'+esc(m.name)+'</div></div>';
-
-  // fields
-  if(pack.capture_fields&&pack.capture_fields.length){
-    h+='<div class="sec"><h3>Field data</h3>';
-    for(const f of pack.capture_fields){
-      const val=(cap.fields&&cap.fields[f.key]!=null)?cap.fields[f.key]:'';
-      h+='<div class="field"><label>'+esc(f.label||f.key)+'</label>';
-      if(f.type==='select'){
-        h+='<div class="opts" data-key="'+esc(f.key)+'">';
-        for(const o of (f.options||[])){h+='<div class="opt'+(String(val)===String(o)?' sel':'')+'" data-val="'+esc(o)+'">'+esc(o)+'</div>';}
-        h+='</div>';
-      } else if(f.type==='textarea'){
-        h+='<textarea data-key="'+esc(f.key)+'" placeholder="'+esc(f.placeholder||'')+'">'+esc(val)+'</textarea>';
-      } else {
-        const t=f.type==='number'?'number':'text';
-        h+='<input type="'+t+'"'+(t==='number'?' inputmode="decimal"':'')+' data-key="'+esc(f.key)+'" value="'+esc(val)+'" placeholder="'+esc(f.placeholder||'')+'">';
-      }
-      h+='</div>';
-    }
-    h+='</div>';
-  }
-
-  // photos
-  const photos=(await photosFor(m.id)).sort((a,b)=>a.seq-b.seq);
-  h+='<div class="sec"><h3>Photos · '+photos.length+'</h3><div class="pgrid" id="pgrid">';
-  for(const p of photos){
-    const u=URL.createObjectURL(p.blob);urlPool.push(u);
-    const g=p.gps?('◉ '+p.gps.lat.toFixed(4)+', '+p.gps.lng.toFixed(4)):'◉ no fix';
-    h+='<div class="ptile"><img src="'+u+'" alt=""><button class="del" data-del="'+esc(p.id)+'" aria-label="Delete photo">✕</button><div class="gps">'+esc(g)+'</div></div>';
-  }
-  h+='<div class="padd" id="padd"><span class="plus">＋</span>Add photos</div>';
-  h+='</div></div>';
-
-  // done toggle
-  h+='<div class="donerow"><div><div class="lbl">Mark as captured</div><div class="sub">Flags this material as done for the report.</div></div>'
-    +'<label class="switch"><input type="checkbox" id="done-toggle"'+(cap.done?' checked':'')+'><span class="track"></span><span class="knob"></span></label></div>';
-
-  h+='<button class="dupbtn" id="btn-dup">Duplicate this asset</button>';
-
-  body.innerHTML=h;
-}
-
-async function saveField(key,val){
-  let cap=capCache[curId]||{materialId:curId,fields:{},done:false};
-  cap.fields=cap.fields||{}; cap.fields[key]=val;
-  capCache[curId]=cap; await putCapture(cap);
-}
-async function setDone(v){
-  let cap=capCache[curId]||{materialId:curId,fields:{},done:false};
-  cap.done=v; capCache[curId]=cap; await putCapture(cap);
-}
-
-/* ---------- photo capture ---------- */
-let shootBusy=false;
-
-async function persistPhotos(blobs){
-  // blobs are already-compressed JPEG Blobs
-  if(!blobs.length||shootBusy)return; shootBusy=true;
-  try{
-    const existing=await photosFor(curId);let seq=existing.reduce((mx,p)=>Math.max(mx,p.seq||0),0);
-    for(const blob of blobs){
-      const gps=await getGPS();
-      seq++;
-      await addPhoto({id:curId+'__'+Date.now()+'__'+Math.random().toString(36).slice(2,7),
-        materialId:curId,seq,ts:new Date().toISOString(),gps,blob});
-      photoCounts[curId]=(photoCounts[curId]||0)+1;
-    }
-    const m=pack.materials.find(x=>x.id===curId);
-    await renderDetail(m,capCache[curId]||{materialId:curId,fields:{},done:false});
-    toast(blobs.length>1?blobs.length+' photos added':'Photo added');
-  }catch(e){toast('Could not save photo');console.error(e);}
-  finally{shootBusy=false;}
-}
-
-async function onPhotos(files){
-  // From the device picker: compress each, then persist (cap a batch at 4)
-  if(!files.length)return;
-  if(files.length>4){toast('Up to 4 photos at a time — added the first 4');files=files.slice(0,4);}
-  const blobs=[];
-  for(const f of files){ try{ blobs.push(await compress(f)); }catch(_){ } }
-  await persistPhotos(blobs);
-}
-
-/* ---------- in-app camera (multi-shot) ---------- */
-let camStream=null, camShots=[];
-async function openCamera(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    $('#file-photo').click(); return;  // no live camera here -> fall back to picker
-  }
-  camShots=[];
-  try{
-    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
-  }catch(e){ toast('Camera unavailable — use From device'); return; }
-  const v=$('#cam-video'); v.srcObject=camStream;
-  $('#cam-strip').innerHTML=''; updateCamCount();
-  $('#cam').classList.remove('hidden');
-}
-function updateCamCount(){
-  $('#cam-count').textContent=camShots.length+(camShots.length===1?' photo':' photos');
-  $('#cam-done').textContent=camShots.length?('Done ('+camShots.length+')'):'Done';
-}
-async function camSnap(){
-  const v=$('#cam-video'); if(!v.videoWidth)return;
-  const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
-  const cw=Math.round(v.videoWidth*scale), ch=Math.round(v.videoHeight*scale);
-  const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
-  cv.getContext('2d').drawImage(v,0,0,cw,ch);
-  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82));
-  if(!blob)return;
-  camShots.push(blob);
-  const img=document.createElement('img'); img.src=URL.createObjectURL(blob);
-  const strip=$('#cam-strip'); strip.appendChild(img); strip.scrollLeft=strip.scrollWidth;
-  updateCamCount();
-}
-function closeCamera(){
-  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
-  $('#cam-video').srcObject=null;
-  $('#cam-strip').querySelectorAll('img').forEach(i=>URL.revokeObjectURL(i.src));
-  $('#cam-strip').innerHTML='';
-  $('#cam').classList.add('hidden');
-}
-async function camDone(){
-  const shots=camShots.slice(); closeCamera();
-  if(shots.length) await persistPhotos(shots);
-}
-
-/* ---------- duplicate an asset ---------- */
-async function duplicateAsset(id){
-  const src=pack.materials.find(m=>m.id===id); if(!src)return;
-  const names=new Set(pack.materials.map(m=>m.name));
-  const base=(src.name||'Asset').replace(/\s*\(\d+\)\s*$/,'');
-  let n=2, name=base+' ('+n+')';
-  while(names.has(name)){ n++; name=base+' ('+n+')'; }
-  const dup={id:src.id+'~dup-'+Date.now().toString(36),name:name,
-    category:src.category||'',subcategory:src.subcategory||'',ref_code:src.ref_code||'',
-    is_duplicate:true,duplicate_of:(src.duplicate_of||src.id)};
-  const idx=pack.materials.indexOf(src);
-  pack.materials.splice(idx+1,0,dup);
-  try{ await kvPut('pack',pack); }catch(e){ console.error(e); }
-  await refreshCaches();
-  toast('Duplicate created');
-  openDetail(dup.id);
-}
-
-/* ---------- export ---------- */
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());}
 async function shareOrDownload(blob,filename){
   try{const file=new File([blob],filename,{type:'application/zip'});
@@ -600,140 +447,654 @@ async function shareOrDownload(blob,filename){
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
-async function exportData(){
-  const btn=$('#btn-export');const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin"></span> Building…';
-  try{
-    await refreshCaches();
-    const photos=await allPhotos();const byMat={};photos.forEach(p=>{(byMat[p.materialId]=byMat[p.materialId]||[]).push(p);});
-    const files=[],out=[];
-    for(const m of pack.materials){
-      const cap=capCache[m.id];const ps=(byMat[m.id]||[]).sort((a,b)=>a.seq-b.seq);
-      if(!cap&&!ps.length)continue;
-      const stMap={todo:'not-started',progress:'in-progress',done:'completed'};
-      const photoOut=[];let i=0;
-      for(const p of ps){i++;const name='photos/'+m.id+'_'+i+'.jpg';
-        files.push({name,data:new Uint8Array(await p.blob.arrayBuffer())});
-        photoOut.push({file:name,ts:p.ts,gps:p.gps||null});}
-      out.push({id:m.id,name:m.name,category:m.category||'',subcategory:m.subcategory||'',
-        ref_code:m.ref_code||'',duplicate_of:m.duplicate_of||null,is_duplicate:!!m.is_duplicate,
-        fields:(cap&&cap.fields)||{},status:stMap[statusFor(m.id)],photos:photoOut});
+
+/* ---------- app state ---------- */
+let projects=[], templates=[];
+let project=null;            // current project record (with .snapshot)
+let caps=[], pics=[];        // current project's captures + photos (loaded on open)
+let urlPool=[];              // object URLs to revoke
+let collapsed={};            // panel category collapse state
+let selectMode=false, selectedProjects=new Set();
+function freeUrls(){urlPool.forEach(URL.revokeObjectURL);urlPool=[];}
+function objUrl(blob){const u=URL.createObjectURL(blob);urlPool.push(u);return u;}
+
+const SCREENS=['dashboard','newproject','info','panel','asset'];
+function show(id){SCREENS.forEach(s=>$('#screen-'+s).classList.toggle('hidden',s!==id));}
+
+/* ---------- template / project helpers ---------- */
+// A template snapshot = { name, captureFields:[], projectInfoFields:[], assets:[{id,name,category,subcategory,ref_code}] }
+function categoriesOf(snap){
+  const seen=[], set=new Set();
+  for(const a of (snap.assets||[])){const c=a.category||'Uncategorised';if(!set.has(c)){set.add(c);seen.push(c);}}
+  return seen;
+}
+function assetsInCategory(snap,cat){return (snap.assets||[]).filter(a=>(a.category||'Uncategorised')===cat);}
+function assetById(snap,id){return (snap.assets||[]).find(a=>a.id===id)||null;}
+
+/* per-photo capture model: capture = {id,projectId,categoryId,assetId|null,fields:{},gps,ts} */
+function capsForAsset(assetId){return caps.filter(c=>c.assetId===assetId);}
+function unknownCapsForCategory(cat){return caps.filter(c=>c.assetId==null && (c.categoryId||'Uncategorised')===cat);}
+function picForCapture(capId){return pics.find(p=>p.captureId===capId)||null;}
+function fieldsFilled(c){return c.fields&&Object.values(c.fields).some(v=>v!==''&&v!=null);}
+
+async function loadProjectData(){
+  caps=await capturesForProject(project.id);
+  pics=await photosForProject(project.id);
+}
+
+/* ===================== DASHBOARD ===================== */
+async function openDashboard(){
+  project=null; freeUrls();
+  projects=(await allOf('proj')).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  templates=(await allOf('tmpl')).sort((a,b)=>(b.importedAt||0)-(a.importedAt||0));
+  // counts per project
+  const allCaps=await allOf('cap'); const cnt={};
+  allCaps.forEach(c=>cnt[c.projectId]=(cnt[c.projectId]||0)+1);
+  dashCounts=cnt;
+  renderDashboard();
+  show('dashboard');
+}
+let dashCounts={};
+function renderDashboard(){
+  const body=$('#dash-body');
+  if(!projects.length){
+    body.innerHTML='<div class="center" style="min-height:50vh">'
+      +'<img class="brandbig" src="logo.png" alt="Auditor">'
+      +'<div class="mark">Auditor · Site Capture</div>'
+      +'<h1>No projects yet</h1><p>Create a project from a desktop template pack to start capturing on site.</p></div>';
+    return;
+  }
+  let h='';
+  for(const p of projects){
+    const n=dashCounts[p.id]||0;
+    const st=n>0?'progress':'todo';
+    const sel=selectedProjects.has(p.id);
+    h+='<div class="card" data-pid="'+esc(p.id)+'">'
+      +'<div class="spine s-'+st+'"></div>'
+      +(selectMode?'<div style="display:flex;align-items:center;padding-left:12px"><div class="selbox'+(sel?' on':'')+'">'+(sel?'✓':'')+'</div></div>':'')
+      +'<div class="cbody"><div class="cname">'+esc(p.name||'Untitled project')+'</div>'
+      +'<div class="cmeta">'+esc(p.snapshot&&p.snapshot.name||'')+(p.snapshot?' · '+(p.snapshot.assets||[]).length+' assets':'')+'</div></div>'
+      +'<div class="cright"><span class="chip'+(n?'':' empty')+'">'+n+' ◦</span></div>'
+      +'</div>';
+  }
+  body.innerHTML=h;
+}
+function refreshDashBar(){
+  const bar=$('#dash-bar');
+  if(selectMode){
+    bar.innerHTML='<button class="btn ghost" id="btn-sel-cancel" style="flex:none;width:auto;padding:0 16px;background:var(--ink)">Cancel</button>'
+      +'<button class="btn primary" id="btn-batch-export">Export '+selectedProjects.size+' selected</button>';
+    $('#btn-sel-cancel').onclick=()=>{selectMode=false;selectedProjects.clear();refreshDashBar();renderDashboard();};
+    $('#btn-batch-export').onclick=batchExport;
+  } else {
+    bar.innerHTML='<button class="btn primary" id="btn-new-project">＋ New project</button>';
+    $('#btn-new-project').onclick=openNewProject;
+  }
+}
+
+/* ===================== NEW PROJECT ===================== */
+function openNewProject(){
+  renderTemplateList();
+  show('newproject');
+}
+function renderTemplateList(){
+  const wrap=$('#np-templates');
+  if(!templates.length){wrap.innerHTML='<p style="color:var(--muted);font-size:14px;margin:2px">No saved templates yet. Import one above.</p>';return;}
+  let h='';
+  for(const t of templates){
+    h+='<div class="optrow" data-tid="'+esc(t.id)+'"><div class="ot"><div class="otitle">'+esc(t.name||'Template')+'</div>'
+      +'<div class="osub">'+(t.assets||[]).length+' assets · '+(t.captureFields||[]).length+' fields</div></div>'
+      +'<button class="odel" data-deltid="'+esc(t.id)+'">Delete</button></div>';
+  }
+  wrap.innerHTML=h;
+}
+
+/* ---------- template pack import (desktop -> phone) ----------
+   Accepts new 'bca-template' v2 packs and legacy 'bca-fieldpack' v1 packs.
+   Shape stored as a template record:
+     { id, name, captureFields:[], projectInfoFields:[], assets:[], importedAt } */
+function normalizeTemplate(p){
+  if(!p) throw new Error('Empty file.');
+  const fmt=p.format;
+  if(fmt!=='bca-template' && fmt!=='bca-fieldpack') throw new Error('This is not a template pack.');
+  const assets=(p.materials||p.assets||[]).map((m,i)=>({
+    id:m.id||('a-'+(i+1)), name:m.name||('Asset '+(i+1)),
+    category:m.category||'', subcategory:m.subcategory||'', ref_code:m.ref_code||''}));
+  if(!assets.length) throw new Error('Template has no assets.');
+  const captureFields=(p.capture_fields||p.captureFields||[]).map(f=>({
+    key:f.key, label:f.label||f.key, type:f.type||'text', options:f.options||[], placeholder:f.placeholder||''}));
+  let projectInfoFields=p.project_info_fields||p.projectInfoFields||[];
+  // Legacy v1 pack: synthesize info fields from project.details keys.
+  if((!projectInfoFields||!projectInfoFields.length) && p.project && p.project.details){
+    projectInfoFields=Object.keys(p.project.details).map(k=>({key:k,label:k,type:'text'}));
+  }
+  projectInfoFields=(projectInfoFields||[]).map(f=>({
+    key:f.key, label:f.label||f.key, type:f.type||'text', options:f.options||[], placeholder:f.placeholder||''}));
+  const name=p.template&&p.template.name || p.project&&p.project.name || 'Template';
+  return {id:uid('tmpl-'),name,captureFields,projectInfoFields,assets,importedAt:Date.now(),
+          defaults:(p.project&&p.project.details)||{}};
+}
+async function importTemplate(obj){
+  const t=normalizeTemplate(obj);
+  await putOf('tmpl',t);
+  templates.unshift(t);
+  toast('Template "'+t.name+'" imported');
+  startProjectFromTemplate(t);
+}
+
+/* ===================== PROJECT INFO FORM ===================== */
+let pendingTemplate=null, pendingInfo={};
+function startProjectFromTemplate(t){
+  pendingTemplate=t; pendingInfo=Object.assign({}, t.defaults||{});
+  $('#info-tmpl').textContent=t.name||'Template';
+  renderInfoForm();
+  show('info');
+}
+function renderInfoForm(){
+  const body=$('#info-body');
+  let h='<h3>Project information</h3>';
+  // Always-present project name field
+  h+=fieldHTML({key:'__name',label:'Project name',type:'text',placeholder:'e.g. 123 Main St'}, pendingInfo.__name||'');
+  for(const f of (pendingTemplate.projectInfoFields||[])){
+    if(f.key==='__name')continue;
+    h+=fieldHTML(f, pendingInfo[f.key]!=null?pendingInfo[f.key]:'');
+  }
+  body.innerHTML=h;
+}
+
+/* shared field renderer (used by info form, asset review, collector popout) */
+function fieldHTML(f,val){
+  let h='<div class="field"><label>'+esc(f.label||f.key)+'</label>';
+  if(f.type==='select'){
+    h+='<div class="opts" data-key="'+esc(f.key)+'">';
+    for(const o of (f.options||[])) h+='<div class="opt'+(String(val)===String(o)?' sel':'')+'" data-val="'+esc(o)+'">'+esc(o)+'</div>';
+    h+='</div>';
+  } else if(f.type==='textarea'){
+    h+='<textarea data-key="'+esc(f.key)+'" placeholder="'+esc(f.placeholder||'')+'">'+esc(val)+'</textarea>';
+  } else {
+    const t=f.type==='number'?'number':'text';
+    h+='<input type="'+t+'"'+(t==='number'?' inputmode="decimal"':'')+' data-key="'+esc(f.key)+'" value="'+esc(val)+'" placeholder="'+esc(f.placeholder||'')+'">';
+  }
+  return h+'</div>';
+}
+/* wire a container of fields to an onSave(key,val) callback */
+function wireFields(container,onSave){
+  container.addEventListener('click',e=>{
+    const opt=e.target.closest('.opt'); if(!opt)return;
+    const wrap=opt.closest('.opts'); const cur=wrap.querySelector('.opt.sel'); const same=cur===opt;
+    if(cur)cur.classList.remove('sel');
+    if(!same){opt.classList.add('sel');onSave(wrap.dataset.key,opt.dataset.val);} else onSave(wrap.dataset.key,'');
+  });
+  let t;
+  container.addEventListener('input',e=>{const el=e.target;if(!el.dataset.key)return;
+    clearTimeout(t);t=setTimeout(()=>onSave(el.dataset.key,el.value),250);});
+}
+
+async function createProjectFromPending(){
+  const name=(pendingInfo.__name||'').trim() || pendingTemplate.name || 'Untitled project';
+  const snap={name:pendingTemplate.name, captureFields:pendingTemplate.captureFields,
+              projectInfoFields:pendingTemplate.projectInfoFields, assets:pendingTemplate.assets};
+  const info={}; for(const k in pendingInfo){if(k!=='__name')info[k]=pendingInfo[k];}
+  const p={id:uid('proj-'),name,templateId:pendingTemplate.id,snapshot:snap,info,
+           createdAt:Date.now(),updatedAt:Date.now(),status:'not-started'};
+  await putOf('proj',p);
+  project=p; caps=[]; pics=[];
+  toast('Project created');
+  openPanel();
+}
+
+/* ===================== PROJECT PANEL ===================== */
+async function openProject(pid){
+  project=await getOf('proj',pid); if(!project)return;
+  await loadProjectData();
+  openPanel();
+}
+function openPanel(){
+  $('#panel-project').textContent=project.name||'Untitled project';
+  renderPanel(); updatePanelPill();
+  show('panel'); window.scrollTo(0,0);
+}
+function updatePanelPill(){
+  const n=caps.length;
+  const pill=$('#panel-pill'); pill.classList.toggle('clean',n===0);
+  $('#panel-sync').textContent=n===0?'nothing captured':n+' photos captured';
+}
+function assetStatus(assetId){
+  const cs=capsForAsset(assetId);
+  if(!cs.length)return 'todo';
+  return cs.some(fieldsFilled)?'done':'progress';
+}
+function renderPanel(){
+  const q=$('#panel-search').value.trim().toLowerCase();
+  const body=$('#panel-body'); const snap=project.snapshot;
+  const cats=categoriesOf(snap);
+  let html='';
+  for(const cat of cats){
+    let assets=assetsInCategory(snap,cat);
+    if(q){assets=assets.filter(a=>((a.name+' '+(a.category||'')+' '+(a.ref_code||'')).toLowerCase().includes(q)));}
+    const unk=unknownCapsForCategory(cat);
+    if(q && !assets.length && !cat.toLowerCase().includes(q))continue;
+    const searching=!!q;
+    const isCol=!searching && !!collapsed[cat];
+    const capturedCount=assets.filter(a=>capsForAsset(a.id).length).length;
+    html+='<div class="group"><div class="glabel'+(isCol?' collapsed':'')+'" data-group="'+esc(cat)+'">'
+      +'<span class="gtitle"><span class="chev">▾</span>'+esc(cat)+'</span>'
+      +'<span class="count">'+capturedCount+'/'+assets.length+'</span></div>';
+    if(!isCol){
+      // Unknown bucket first if it has anything
+      if(unk.length){
+        html+='<div class="card" data-unk="'+esc(cat)+'"><div class="spine s-progress"></div>'
+          +'<div class="cbody"><div class="cname">Unknown — '+esc(cat)+'</div>'
+          +'<div class="cmeta"><span class="stag t-unknown">Unassigned</span>'
+          +(unk.some(fieldsFilled)?'<span class="stag t-done">has data</span>':'')+'</div></div>'
+          +'<div class="cright"><span class="chip">'+unk.length+' ◦</span></div></div>';
+      }
+      for(const a of assets){
+        const st=assetStatus(a.id), n=capsForAsset(a.id).length;
+        const stag=st==='done'?'<span class="stag t-done">Captured</span>':st==='progress'?'<span class="stag t-progress">In progress</span>':'<span class="stag">Not started</span>';
+        html+='<div class="card" data-aid="'+esc(a.id)+'"><div class="spine s-'+st+'"></div>'
+          +'<div class="cbody"><div class="cname">'+esc(a.name)+'</div>'
+          +'<div class="cmeta">'+(a.ref_code?'<span class="ref">'+esc(a.ref_code)+'</span>':'')+stag+'</div></div>'
+          +'<div class="cright"><span class="chip'+(n?'':' empty')+'">'+n+' ◦</span></div></div>';
+      }
     }
-    if(!out.length){toast('Nothing captured yet');return;}
-    const data={format:'bca-fielddata',version:1,project_id:pack.project.id,project_name:pack.project.name,
-      captured_at:new Date().toISOString(),material_count:out.length,materials:out};
-    files.unshift({name:'data.json',data:enc(JSON.stringify(data,null,2))});
-    const zip=buildZip(files);
-    await shareOrDownload(zip,'fielddata_'+(pack.project.name||'project').replace(/[^a-z0-9]+/gi,'-').slice(0,40)+'_'+stamp()+'.zip');
-    toast('Exported '+out.length+' materials');
-  }catch(e){toast('Export failed');console.error(e);}
-  finally{btn.disabled=false;btn.innerHTML=orig;}
+    html+='</div>';
+  }
+  body.innerHTML=html || '<div class="center" style="min-height:40vh"><p>No assets match "'+esc(q)+'".</p></div>';
 }
 
-/* ---------- import ---------- */
-function validatePack(p){
-  if(!p||p.format!=='bca-fieldpack')throw new Error('This file is not a field pack.');
-  if(!p.project||!Array.isArray(p.materials))throw new Error('Field pack is missing project or materials.');
-  p.project.id=p.project.id||('proj-'+Date.now());
-  p.materials.forEach((m,i)=>{m.id=m.id||('m-'+(i+1));m.name=m.name||('Material '+(i+1));});
-  p.capture_fields=p.capture_fields||[];
-  return p;
+/* ===================== ASSET / BUCKET REVIEW ===================== */
+let reviewCtx=null; // {assetId|null, category, name}
+async function openAsset(assetId){
+  const a=assetById(project.snapshot,assetId); if(!a)return;
+  reviewCtx={assetId:a.id, category:a.category||'Uncategorised', name:a.name};
+  $('#asset-eyebrow').textContent=(a.category||'')+(a.subcategory?' · '+a.subcategory:'');
+  $('#asset-head').textContent=a.name;
+  renderAsset(); show('asset'); window.scrollTo(0,0);
 }
-async function loadPack(obj,{fresh}={}){
-  const p=validatePack(obj);
-  const prev=await kvGet('pack');
-  if(fresh||(prev&&prev.project&&prev.project.id!==p.project.id)){await clearAll();}
-  pack=p; await kvPut('pack',p);
-  await openList();
-  toast('Loaded '+p.materials.length+' materials');
+function openUnknownBucket(cat){
+  reviewCtx={assetId:null, category:cat, name:'Unknown — '+cat};
+  $('#asset-eyebrow').textContent=cat;
+  $('#asset-head').textContent='Unknown photos';
+  renderAsset(); show('asset'); window.scrollTo(0,0);
+}
+function reviewCaps(){
+  return reviewCtx.assetId!=null ? capsForAsset(reviewCtx.assetId) : unknownCapsForCategory(reviewCtx.category);
+}
+function renderAsset(){
+  freeUrls();
+  const body=$('#asset-body');
+  const list=reviewCaps().sort((a,b)=>(a.ts||'').localeCompare(b.ts||''));
+  const fields=project.snapshot.captureFields||[];
+  let h='<div class="dhead"><div class="dcat">'+esc(reviewCtx.category)+'</div><div class="dname">'+esc(reviewCtx.name)+'</div></div>';
+  if(!list.length){
+    h+='<div class="sec"><p style="color:var(--muted);margin:0">No photos yet. Use the Data Collector, or “Take photo” below.</p></div>';
+  }
+  for(const c of list){
+    const pic=picForCapture(c.id);
+    const thumb=pic?'<img src="'+objUrl(pic.blob)+'" alt="">':'<div class="nophoto">▦</div>';
+    const g=c.gps?('◉ '+c.gps.lat.toFixed(4)+', '+c.gps.lng.toFixed(4)):'◉ no fix';
+    h+='<div class="capcard" data-cap="'+esc(c.id)+'"><div class="thumb">'+thumb+'</div>'
+      +'<div class="cfields"><div class="crow"><span class="cgps">'+esc(g)+'</span>'
+      +'<button class="cdel" data-delcap="'+esc(c.id)+'">Delete</button></div>'
+      +'<div class="capfields" data-cap="'+esc(c.id)+'">';
+    for(const f of fields){h+=fieldHTML(f, c.fields&&c.fields[f.key]!=null?c.fields[f.key]:'');}
+    if(!fields.length)h+='<span style="color:var(--muted);font-size:13px">No fields in this template.</span>';
+    h+='</div></div></div>';
+  }
+  body.innerHTML=h;
+}
+async function saveCapField(capId,key,val){
+  const c=caps.find(x=>x.id===capId); if(!c)return;
+  c.fields=c.fields||{}; c.fields[key]=val; c.updatedAt=Date.now();
+  await putOf('cap',c); touchProject();
+}
+async function deleteCapture(capId){
+  const ph=await photosForCapture(capId);
+  for(const p of ph) await delOf('pic',p.id);
+  await delOf('cap',capId);
+  caps=caps.filter(c=>c.id!==capId); pics=pics.filter(p=>p.captureId!==capId);
+  toast('Photo deleted'); touchProject();
+}
+function touchProject(){project.updatedAt=Date.now();putOf('proj',project);}
+
+/* add a capture (photo) to the current review context (asset or unknown bucket) */
+async function addCapturesFromBlobs(blobs,assetId,category){
+  for(const blob of blobs){
+    const gps=await getGPS();
+    const capId=uid('cap-');
+    const cap={id:capId,projectId:project.id,categoryId:category||'Uncategorised',
+               assetId:assetId,fields:{},gps,ts:new Date().toISOString()};
+    await putOf('cap',cap); caps.push(cap);
+    const pic={id:uid('pic-'),captureId:capId,projectId:project.id,ts:cap.ts,blob};
+    await putOf('pic',pic); pics.push(pic);
+  }
+  touchProject();
 }
 
-/* ---------- sample pack ---------- */
-function samplePack(){
-  const cf=[
-    {key:'condition',label:'Condition',type:'select',options:['Good','Fair','Poor','Failed']},
-    {key:'rul',label:'Est. remaining life (yrs)',type:'number',placeholder:'e.g. 10'},
-    {key:'qty',label:'Approx. quantity',type:'text',placeholder:'e.g. 250 m²'},
-    {key:'notes',label:'Field notes',type:'textarea',placeholder:'Observations, defects, location…'}
-  ];
-  const mats=[
-    ['Roofing','Low-slope membrane','RF-01','Modified bitumen — main roof'],
-    ['Roofing','Flashing & parapets','RF-04','Metal cap flashing'],
-    ['Roofing','Roof drains','RF-07','Interior drains'],
-    ['Exterior walls','Cladding','EW-01','Brick veneer — north & east'],
-    ['Exterior walls','Sealants','EW-05','Perimeter window sealant'],
-    ['Exterior walls','Glazing','EW-08','Aluminium-framed windows'],
-    ['Mechanical','Heating','ME-01','Rooftop gas units (x3)'],
-    ['Mechanical','Domestic hot water','ME-04','Gas-fired water heater'],
-    ['Site & civil','Paving','SC-02','Asphalt parking lot'],
-    ['Site & civil','Site lighting','SC-06','Pole-mounted LED fixtures']
-  ];
-  return {format:'bca-fieldpack',version:1,
-    project:{id:'sample-123-main',name:'123 Main St — sample',details:{Client:'Demo Holdings',"Site ID":'S-0042',"Building Name":'Main St Office'}},
-    capture_fields:cf,
-    materials:mats.map((m,i)=>({id:'m-'+String(i+1).padStart(3,'0'),category:m[0],subcategory:m[1],ref_code:m[2],name:m[3]}))};
+/* ===================== DATA COLLECTOR (camera-first) ===================== */
+let colStream=null, colCategory=null, colAssetId=null, colAssetName=null;
+let colPendingCap=null;  // capture awaiting field input (popout open)
+async function openCollector(){
+  const cats=categoriesOf(project.snapshot);
+  colCategory=cats[0]||'Uncategorised'; colAssetId=null; colAssetName=null; colPendingCap=null;
+  renderColRail(); renderColAssetBar(); updateColTag(); hidePopout();
+  $('#col-count').textContent=caps.length;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('No camera here — use “Take photo” in an asset');return;}
+  try{colStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
+  catch(e){toast('Camera unavailable');return;}
+  $('#col-video').srcObject=colStream;
+  $('#collector').classList.remove('hidden');
+}
+function closeCollector(){
+  if(colStream){colStream.getTracks().forEach(t=>t.stop());colStream=null;}
+  $('#col-video').srcObject=null;
+  $('#collector').classList.add('hidden');
+  hidePopout();
+  // refresh panel to reflect new captures
+  renderPanel(); updatePanelPill();
+}
+function renderColRail(){
+  const rail=$('#col-rail'); const cats=categoriesOf(project.snapshot);
+  rail.innerHTML=cats.map(c=>{
+    const n=caps.filter(x=>(x.categoryId||'Uncategorised')===c).length;
+    return '<button class="col-cat'+(c===colCategory?' sel':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'<span class="cc-n">'+n+' shots</span></button>';
+  }).join('');
+}
+function renderColAssetBar(){
+  const bar=$('#col-assetbar'), list=$('#col-assetlist');
+  bar.classList.toggle('hidden',!colCategory);
+  if(!colCategory){list.classList.remove('show');return;}
+  const q=$('#col-assetsearch').value.trim().toLowerCase();
+  let assets=assetsInCategory(project.snapshot,colCategory);
+  if(q)assets=assets.filter(a=>a.name.toLowerCase().includes(q)||(a.ref_code||'').toLowerCase().includes(q));
+  let h='<div class="col-aitem unk'+(colAssetId==null?' sel':'')+'" data-aid="">＋ Unknown (file under '+esc(colCategory)+')</div>';
+  for(const a of assets){h+='<div class="col-aitem'+(colAssetId===a.id?' sel':'')+'" data-aid="'+esc(a.id)+'">'+esc(a.name)+(a.ref_code?' · '+esc(a.ref_code):'')+'</div>';}
+  list.innerHTML=h;
+}
+function updateColTag(){
+  const tag=$('#col-tag');
+  if(colAssetId!=null)tag.innerHTML='<b>'+esc(colAssetName)+'</b> · '+esc(colCategory);
+  else tag.innerHTML='<b>Unknown</b> · '+esc(colCategory||'pick a category');
+}
+async function colSnap(){
+  const v=$('#col-video'); if(!v.videoWidth)return;
+  const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
+  const cw=Math.round(v.videoWidth*scale), ch=Math.round(v.videoHeight*scale);
+  const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+  cv.getContext('2d').drawImage(v,0,0,cw,ch);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82)); if(!blob)return;
+  const gps=await getGPS();
+  const capId=uid('cap-');
+  const cap={id:capId,projectId:project.id,categoryId:colCategory||'Uncategorised',
+             assetId:colAssetId,fields:{},gps,ts:new Date().toISOString()};
+  await putOf('cap',cap); caps.push(cap);
+  const pic={id:uid('pic-'),captureId:capId,projectId:project.id,ts:cap.ts,blob};
+  await putOf('pic',pic); pics.push(pic);
+  touchProject();
+  colPendingCap=cap;
+  $('#col-count').textContent=caps.length;
+  renderColRail();
+  showPopout(cap,blob);
+}
+function showPopout(cap,blob){
+  $('#col-popthumb').src=objUrl(blob);
+  $('#col-poptitle').textContent=colAssetId!=null?colAssetName:'Unknown photo';
+  $('#col-popsub').textContent=(colCategory||'')+(colAssetId==null?' · file as Unknown':'');
+  const fields=project.snapshot.captureFields||[];
+  const wrap=$('#col-popfields');
+  wrap.innerHTML=fields.length?fields.map(f=>fieldHTML(f,'')).join(''):'<p style="color:var(--muted)">No fields in this template — tap Next for the next photo.</p>';
+  $('#col-pop').classList.add('show');
+  $('#col-popbar').classList.remove('hide'); $('#col-popbar').classList.add('show');
+  $('#col-shutter').classList.add('armed');
+}
+function hidePopout(){
+  colPendingCap=null;
+  $('#col-pop').classList.remove('show');
+  $('#col-popbar').classList.add('hide'); $('#col-popbar').classList.remove('show');
+  $('#col-shutter').classList.remove('armed');
+}
+/* shutter is a toggle: if a popout is open, commit & re-arm; else take a shot */
+function colShutter(){ if(colPendingCap)hidePopout(); else colSnap(); }
+async function colPopSave(key,val){
+  if(!colPendingCap)return;
+  colPendingCap.fields=colPendingCap.fields||{}; colPendingCap.fields[key]=val; colPendingCap.updatedAt=Date.now();
+  await putOf('cap',colPendingCap);
+}
+async function colPopDelete(){
+  if(!colPendingCap)return;
+  await deleteCapture(colPendingCap.id);
+  $('#col-count').textContent=caps.length;
+  renderColRail(); hidePopout();
 }
 
-/* ---------- wiring ---------- */
+/* ===================== EXPORT (phone -> desktop) =====================
+   v2 field data. Single project => one zip. Batch => one zip with projects/<id>/.
+   Per-project payload embeds the template snapshot so the desktop can CREATE a project. */
+async function buildProjectPayload(p, capList, picList, prefix){
+  const byCap={}; picList.forEach(pic=>{(byCap[pic.captureId]=byCap[pic.captureId]||[]).push(pic);});
+  const files=[]; const outCaps=[]; let i=0;
+  for(const c of capList){
+    const ph=(byCap[c.id]||[]); let photoPath=null;
+    if(ph.length){i++; photoPath=prefix+'photos/'+slug(c.assetId||c.categoryId)+'_'+i+'.jpg';
+      files.push({name:photoPath,data:new Uint8Array(await ph[0].blob.arrayBuffer())});}
+    const a=c.assetId!=null?assetById(p.snapshot,c.assetId):null;
+    outCaps.push({id:c.id,categoryId:c.categoryId,assetId:c.assetId,
+      assetName:a?a.name:null, ref_code:a?a.ref_code:'',
+      fields:c.fields||{}, hasData:fieldsFilled(c), gps:c.gps||null, ts:c.ts, photo:photoPath});
+  }
+  const data={project:{id:p.id,name:p.name,info:p.info||{},templateId:p.templateId},
+    template:{name:p.snapshot.name,captureFields:p.snapshot.captureFields,
+              projectInfoFields:p.snapshot.projectInfoFields,assets:p.snapshot.assets},
+    captures:outCaps, captured_at:new Date().toISOString(), capture_count:outCaps.length};
+  return {files,data};
+}
+async function exportProject(p){
+  const capList=await capturesForProject(p.id);
+  const picList=await photosForProject(p.id);
+  if(!capList.length){toast('Nothing captured yet');return;}
+  const {files,data}=await buildProjectPayload(p,capList,picList,'');
+  const payload=Object.assign({format:'bca-fielddata',version:2},data);
+  files.unshift({name:'data.json',data:enc(JSON.stringify(payload,null,2))});
+  const zip=buildZip(files);
+  await shareOrDownload(zip,'fielddata_'+slug(p.name)+'_'+stamp()+'.zip');
+  toast('Exported '+data.capture_count+' photos');
+}
+async function batchExport(){
+  const ids=[...selectedProjects]; if(!ids.length){toast('Select projects first');return;}
+  const manifest={format:'bca-fielddata-batch',version:2,exported_at:new Date().toISOString(),projects:[]};
+  const allFiles=[];
+  for(const id of ids){
+    const p=await getOf('proj',id); if(!p)continue;
+    const capList=await capturesForProject(id), picList=await photosForProject(id);
+    const prefix='projects/'+slug(p.name)+'-'+id.slice(-5)+'/';
+    const {files,data}=await buildProjectPayload(p,capList,picList,prefix);
+    const proj=Object.assign({format:'bca-fielddata',version:2},data);
+    allFiles.push({name:prefix+'data.json',data:enc(JSON.stringify(proj,null,2))});
+    allFiles.push(...files);
+    manifest.projects.push({id:p.id,name:p.name,dir:prefix,capture_count:data.capture_count});
+  }
+  if(!manifest.projects.length){toast('Nothing to export');return;}
+  allFiles.unshift({name:'manifest.json',data:enc(JSON.stringify(manifest,null,2))});
+  const zip=buildZip(allFiles);
+  await shareOrDownload(zip,'fielddata_batch_'+stamp()+'.zip');
+  toast('Exported '+manifest.projects.length+' projects');
+  selectMode=false; selectedProjects.clear(); refreshDashBar(); renderDashboard();
+}
+
+/* ===================== one-time v1 migration ===================== */
+async function migrateV1IfNeeded(){
+  try{
+    if(!db.objectStoreNames.contains('captures'))return;
+    const oldPack=await kvGet('pack'); if(!oldPack)return;
+    const existing=await allOf('proj'); if(existing.length)return; // already migrated / has projects
+    const t=normalizeTemplate(oldPack);
+    await putOf('tmpl',t);
+    const info={}; (t.projectInfoFields||[]).forEach(f=>{info[f.key]=(oldPack.project.details||{})[f.key]||'';});
+    const p={id:uid('proj-'),name:oldPack.project.name||'Imported project',templateId:t.id,
+             snapshot:{name:t.name,captureFields:t.captureFields,projectInfoFields:t.projectInfoFields,assets:t.assets},
+             info,createdAt:Date.now(),updatedAt:Date.now(),status:'in-progress'};
+    await putOf('proj',p);
+    // old captures (keyed materialId) -> new per-photo captures
+    const oldCaps=await px(store('captures').getAll());
+    const oldPhotos=await px(store('photos').getAll());
+    const capByMat={}; oldCaps.forEach(c=>capByMat[c.materialId]=c);
+    const photosByMat={}; oldPhotos.forEach(ph=>{(photosByMat[ph.materialId]=photosByMat[ph.materialId]||[]).push(ph);});
+    const assetCat={}; t.assets.forEach(a=>assetCat[a.id]=a.category||'Uncategorised');
+    const mats=new Set([...Object.keys(capByMat),...Object.keys(photosByMat)]);
+    for(const mid of mats){
+      const fields=(capByMat[mid]&&capByMat[mid].fields)||{};
+      const cat=assetCat[mid]||'Uncategorised';
+      const phs=(photosByMat[mid]||[]).sort((a,b)=>(a.seq||0)-(b.seq||0));
+      if(phs.length){
+        let first=true;
+        for(const ph of phs){
+          const capId=uid('cap-');
+          await putOf('cap',{id:capId,projectId:p.id,categoryId:cat,assetId:mid,
+            fields:first?fields:{},gps:ph.gps||null,ts:ph.ts||new Date().toISOString()});
+          await putOf('pic',{id:uid('pic-'),captureId:capId,projectId:p.id,ts:ph.ts,blob:ph.blob});
+          first=false;
+        }
+      } else if(Object.keys(fields).length){
+        await putOf('cap',{id:uid('cap-'),projectId:p.id,categoryId:cat,assetId:mid,fields,gps:null,ts:new Date().toISOString()});
+      }
+    }
+    await kvPut('pack',undefined); // mark consumed (kept harmless)
+    toast('Your previous capture was imported as a project');
+  }catch(e){console.warn('migration skipped',e);}
+}
+
+/* ===================== boot + wiring ===================== */
+async function boot(){
+  await openDB();
+  wire();
+  await migrateV1IfNeeded();
+  await openDashboard();
+  if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('sw.js');}catch(e){}}
+}
+
 function wire(){
-  $('#btn-import').onclick=()=>$('#file-pack').click();
-  $('#btn-sample').onclick=()=>loadPack(samplePack(),{fresh:true});
-  $('#file-pack').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-    try{const txt=await f.text();await loadPack(JSON.parse(txt));}catch(err){toast(err.message||'Could not read that file');}};
-
-  $('#search').oninput=()=>renderList();
-  $('#btn-export').onclick=exportData;
-  $('#btn-back').onclick=()=>{openList();};
-  $('#btn-shoot').onclick=openCamera;
-  $('#btn-device').onclick=()=>$('#file-photo').click();
-  $('#file-photo').onchange=e=>{const fs=[...e.target.files];e.target.value='';onPhotos(fs);};
-  $('#cam-shutter').onclick=camSnap;
-  $('#cam-done').onclick=camDone;
-  $('#cam-cancel').onclick=closeCamera;
-
-  $('#btn-help').onclick=()=>toast('Pick a material, shoot photos, fill the fields. Export when you have signal.');
-  $('#btn-menu').onclick=async()=>{
-    if(confirm('Reset this device? This clears the loaded pack and all captured photos and data on this phone.')){
-      await clearAll();pack=null;freeUrls();show('import');toast('Device cleared');}
+  /* ---- dashboard ---- */
+  $('#dash-body').addEventListener('click',e=>{
+    const card=e.target.closest('[data-pid]'); if(!card)return;
+    const pid=card.dataset.pid;
+    if(selectMode){
+      if(selectedProjects.has(pid))selectedProjects.delete(pid);else selectedProjects.add(pid);
+      renderDashboard(); refreshDashBar(); return;
+    }
+    openProject(pid);
+  });
+  $('#dash-select').onclick=()=>{
+    if(!projects.length){toast('No projects to export');return;}
+    selectMode=!selectMode; selectedProjects.clear(); refreshDashBar(); renderDashboard();
   };
+  $('#dash-menu').onclick=async()=>{
+    if(confirm('Reset this device? This deletes ALL projects, templates, photos and data stored on this phone.')){
+      for(const s of ['kv','tmpl','proj','cap','pic'])await px(store(s,'readwrite').clear());
+      toast('Device cleared'); openDashboard();
+    }
+  };
+  $('#btn-new-project').onclick=openNewProject;
 
-  // list: open material
-  $('#list-body').addEventListener('click',e=>{
+  /* ---- new project ---- */
+  $('#np-back').onclick=openDashboard;
+  $('#np-import').onclick=()=>$('#file-pack').click();
+  $('#file-pack').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    try{await importTemplate(JSON.parse(await f.text()));}catch(err){toast(err.message||'Could not read that file');}};
+  $('#np-templates').addEventListener('click',async e=>{
+    const del=e.target.closest('[data-deltid]');
+    if(del){const id=del.dataset.deltid;if(confirm('Delete this saved template? Existing projects keep their own copy.')){
+      await delOf('tmpl',id);templates=templates.filter(t=>t.id!==id);renderTemplateList();}return;}
+    const row=e.target.closest('[data-tid]'); if(row)startProjectFromTemplate(templates.find(t=>t.id===row.dataset.tid));
+  });
+
+  /* ---- project info ---- */
+  $('#info-back').onclick=openNewProject;
+  wireFields($('#info-body'),(k,v)=>{pendingInfo[k]=v;});
+  $('#info-save').onclick=createProjectFromPending;
+
+  /* ---- panel ---- */
+  $('#panel-back').onclick=openDashboard;
+  $('#panel-search').oninput=renderPanel;
+  $('#btn-collector').onclick=openCollector;
+  $('#panel-info').onclick=()=>{
+    const lines=Object.entries(project.info||{}).map(([k,v])=>k+': '+(v||'—')).join('\n');
+    toast('Project info — '+(project.name||''));
+    alert((project.name||'Project')+'\n\n'+(lines||'No project information recorded.'));
+  };
+  $('#panel-menu').onclick=()=>{
+    if(confirm('Export this project now?\n(Cancel to keep it for batch export from the dashboard.)'))exportProject(project);
+  };
+  $('#panel-body').addEventListener('click',e=>{
     const gl=e.target.closest('.glabel');
-    if(gl){const g=gl.dataset.group;collapsed[g]=!collapsed[g];renderList();return;}
-    const c=e.target.closest('.card');if(c)openDetail(c.dataset.id);
+    if(gl){const g=gl.dataset.group;collapsed[g]=!collapsed[g];renderPanel();return;}
+    const unk=e.target.closest('[data-unk]'); if(unk){openUnknownBucket(unk.dataset.unk);return;}
+    const a=e.target.closest('[data-aid]'); if(a)openAsset(a.dataset.aid);
   });
 
-  // detail: delegated inputs
-  const body=$('#detail-body');
-  body.addEventListener('click',e=>{
-    const opt=e.target.closest('.opt');
-    if(opt){const wrap=opt.closest('.opts');const cur=wrap.querySelector('.opt.sel');
-      const same=cur===opt;
-      if(cur)cur.classList.remove('sel');
-      if(!same){opt.classList.add('sel');saveField(wrap.dataset.key,opt.dataset.val);}
-      else saveField(wrap.dataset.key,'');
-      return;}
-    const del=e.target.closest('.del');
-    if(del){if(confirm('Delete this photo?'))removePhoto(del.dataset.del);return;}
-    const add=e.target.closest('#padd');
-    if(add){openCamera();return;}
-    if(e.target.id==='btn-dup'){duplicateAsset(curId);return;}
+  /* ---- asset / bucket review ---- */
+  $('#asset-back').onclick=openPanel;
+  $('#asset-shoot').onclick=async()=>{
+    // quick capture into this context using the live camera collector? Here use file/camera capture
+    $('#file-photo').click();
+  };
+  $('#asset-device').onclick=()=>$('#file-photo').click();
+  $('#file-photo').onchange=async e=>{
+    let fs=[...e.target.files]; e.target.value=''; if(!fs.length)return;
+    if(fs.length>4){toast('Up to 4 at a time — added the first 4');fs=fs.slice(0,4);}
+    const blobs=[]; for(const f of fs){try{blobs.push(await compress(f));}catch(_){}}
+    await addCapturesFromBlobs(blobs,reviewCtx.assetId,reviewCtx.category);
+    renderAsset(); toast(blobs.length>1?blobs.length+' photos added':'Photo added');
+  };
+  $('#asset-body').addEventListener('click',e=>{
+    const del=e.target.closest('[data-delcap]');
+    if(del){if(confirm('Delete this photo and its data?'))deleteCapture(del.dataset.delcap).then(renderAsset);return;}
   });
-  let typingTimer;
-  body.addEventListener('input',e=>{const el=e.target;if(!el.dataset.key)return;
-    clearTimeout(typingTimer);typingTimer=setTimeout(()=>saveField(el.dataset.key,el.value),300);});
-  body.addEventListener('change',e=>{if(e.target.id==='done-toggle')setDone(e.target.checked);});
+  // select chips map to their owning capture (each capture renders its own .capfields block)
+  $('#asset-body').addEventListener('click',e=>{
+    const opt=e.target.closest('.opt'); if(!opt)return;
+    const cf=opt.closest('.capfields'); if(!cf)return;
+    const wrap=opt.closest('.opts'); const sel=wrap.querySelector('.opt.sel'); const same=sel===opt;
+    if(sel)sel.classList.remove('sel');
+    if(!same){opt.classList.add('sel');saveCapField(cf.dataset.cap,wrap.dataset.key,opt.dataset.val);}
+    else saveCapField(cf.dataset.cap,wrap.dataset.key,'');
+  });
+  $('#asset-body').addEventListener('input',e=>{
+    const el=e.target; if(!el.dataset.key)return;
+    const cf=el.closest('.capfields'); if(!cf)return;
+    clearTimeout(el._t); el._t=setTimeout(()=>saveCapField(cf.dataset.cap,el.dataset.key,el.value),250);
+  });
+
+  /* ---- data collector ---- */
+  $('#col-close').onclick=closeCollector;
+  $('#col-shutter').onclick=colShutter;
+  $('#col-rail').addEventListener('click',e=>{
+    const b=e.target.closest('.col-cat'); if(!b)return;
+    colCategory=b.dataset.cat; colAssetId=null; colAssetName=null;
+    $('#col-assetsearch').value=''; renderColRail(); renderColAssetBar();
+    $('#col-assetlist').classList.add('show'); updateColTag();
+  });
+  $('#col-assetsearch').oninput=()=>{renderColAssetBar();$('#col-assetlist').classList.add('show');};
+  $('#col-assetsearch').onfocus=()=>{renderColAssetBar();$('#col-assetlist').classList.add('show');};
+  $('#col-assetlist').addEventListener('click',e=>{
+    const it=e.target.closest('.col-aitem'); if(!it)return;
+    const aid=it.dataset.aid;
+    if(aid){const a=assetById(project.snapshot,aid);colAssetId=a.id;colAssetName=a.name;}
+    else{colAssetId=null;colAssetName=null;}
+    renderColAssetBar(); $('#col-assetlist').classList.remove('show'); updateColTag();
+  });
+  wireFields($('#col-popfields'),colPopSave);
+  // select chips in popout
+  $('#col-popfields').addEventListener('click',e=>{
+    const opt=e.target.closest('.opt'); if(!opt)return;
+    const wrap=opt.closest('.opts'); const sel=wrap.querySelector('.opt.sel'); const same=sel===opt;
+    if(sel)sel.classList.remove('sel');
+    if(!same){opt.classList.add('sel');colPopSave(wrap.dataset.key,opt.dataset.val);}else colPopSave(wrap.dataset.key,'');
+  });
+  $('#col-popnext').onclick=hidePopout;
+  $('#col-popdel').onclick=colPopDelete;
 }
 
-async function removePhoto(pid){
-  await delPhoto(pid);
-  photoCounts[curId]=Math.max(0,(photoCounts[curId]||1)-1);
-  const m=pack.materials.find(x=>x.id===curId);
-  await renderDetail(m,capCache[curId]||{materialId:curId,fields:{},done:false});
-  toast('Photo deleted');
-}
-
-window.addEventListener('online',()=>{const p=$('#sync-pill');});
 boot().catch(e=>{document.body.innerHTML='<div class="center"><h1>Storage unavailable</h1><p>This browser blocked local storage. Open the app in a normal (non-private) tab over https.</p></div>';console.error(e);});
 </script>
 </body>
