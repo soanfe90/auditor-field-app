@@ -256,7 +256,7 @@
   /* count badge is tappable (opens the photo tray) */
   .col-count{cursor:pointer}
   /* zoom control */
-  .col-zoom{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);translate:-50% 0;
+  .col-zoom{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 104px);translate:-50% 0;
     z-index:3;display:flex;align-items:center;gap:2px;background:rgba(0,0,0,.5);border-radius:999px;padding:4px}
   .col-zoom button{width:38px;height:38px;border:none;border-radius:50%;background:rgba(255,255,255,.14);
     color:#fff;font-size:20px;line-height:1;cursor:pointer}
@@ -268,10 +268,16 @@
     translate:-50% -50%;z-index:4;pointer-events:none;opacity:0;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
   .col-focus.show{animation:focusPulse .7s ease-out}
   @keyframes focusPulse{0%{opacity:0;scale:1.6}30%{opacity:1}100%{opacity:0;scale:1}}
-  /* post-shot preview */
-  .col-preview{position:absolute;inset:0;z-index:8;background:#000;display:flex}
+  /* post-shot preview — transparent: the paused (frozen) camera frame IS the photo */
+  .col-preview{position:absolute;inset:0;z-index:8;background:transparent;display:flex}
   .col-preview.hide{display:none}
-  .col-preview img{width:100%;height:100%;object-fit:contain;background:#000}
+  .col-preview img{display:none}   /* frozen <video> shows the captured frame; no separate <img> decode */
+  /* while reviewing a shot, hide the live-camera chrome for a clean preview */
+  .collector.reviewing .col-rail,
+  .collector.reviewing .col-assetbar,
+  .collector.reviewing .col-zoom,
+  .collector.reviewing .col-bar,
+  .collector.reviewing .col-top{display:none}
   .col-prevbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:center;
     padding:14px 18px calc(env(safe-area-inset-bottom) + 18px);
     background:linear-gradient(transparent,rgba(0,0,0,.6))}
@@ -993,8 +999,9 @@ async function focusAt(clientX,clientY){
 
 /* ---- take a shot -> PREVIEW (data fields are optional, via "Add data") ---- */
 function colSnap(){
-  if(!$('#col-preview').classList.contains('hide'))return;   // ignore while previewing
+  if($('#collector').classList.contains('reviewing'))return;   // ignore while previewing
   const v=$('#col-video'); if(!v.videoWidth)return;
+  // 1) draw the current frame NOW (synchronous, fast) and freeze the feed for an instant preview
   const maxDim=2000, scale=Math.min(1,maxDim/Math.max(v.videoWidth,v.videoHeight));
   const cw=Math.round(v.videoWidth*scale), ch=Math.round(v.videoHeight*scale);
   const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
@@ -1002,46 +1009,48 @@ function colSnap(){
   if(digitalZoom&&zoom>1){ const sw=v.videoWidth/zoom, sh=v.videoHeight/zoom;
     ctx.drawImage(v,(v.videoWidth-sw)/2,(v.videoHeight-sh)/2,sw,sh,0,0,cw,ch); }
   else ctx.drawImage(v,0,0,cw,ch);
+  try{ v.pause(); }catch(_){}                  // freeze the captured frame on screen — zero cost
+  const cap={id:uid('cap-'),projectId:project.id,categoryId:colCategory||'Uncategorised',
+             assetId:colAssetId,fields:{},gps:null,ts:new Date().toISOString()};
+  colPendingCap=cap; caps.push(cap);
+  $('#col-count').textContent=caps.length; renderColRail();
+  enterReview();                               // 2) show Next / Add data / Delete IMMEDIATELY
+  // 3) encode + persist entirely in the background (never blocks the buttons)
   cv.toBlob(blob=>{
-    if(!blob)return;
-    const cap={id:uid('cap-'),projectId:project.id,categoryId:colCategory||'Uncategorised',
-               assetId:colAssetId,fields:{},gps:null,ts:new Date().toISOString()};
-    colPendingCap=cap;
-    showPreview(blob);                       // IMMEDIATE — show options the instant the frame is ready
-    // everything below is background work (no awaits block the preview)
-    caps.push(cap);
+    if(cap._deleted||!blob)return;
     const pic={id:uid('pic-'),captureId:cap.id,projectId:project.id,ts:cap.ts,blob};
     pics.push(pic);
-    $('#col-count').textContent=caps.length; renderColRail();
     putOf('cap',cap); putOf('pic',pic); touchProject();
-    getGPS().then(g=>{ if(g){ cap.gps=g; putOf('cap',cap); } });
   },'image/jpeg',0.82);
+  getGPS().then(g=>{ if(g&&!cap._deleted){ cap.gps=g; putOf('cap',cap); } });
 }
-function showPreview(blob){
-  $('#col-previmg').src=objUrl(blob);
-  $('#col-preview').classList.remove('hide','fields');   // photo + Next/Add data/Delete bar
-  $('#col-shutter').classList.add('armed');
+/* show the preview state instantly: the live feed is already paused (frozen frame = the photo),
+   so all we do is reveal the Next / Add data / Delete bar and hide the camera chrome. */
+function enterReview(){
+  $('#collector').classList.add('reviewing');
+  $('#col-preview').classList.remove('hide','fields');
 }
 /* leave the capture flow entirely -> back to the live camera */
 function exitCaptureFlow(){
   colPendingCap=null;
+  $('#collector').classList.remove('reviewing');
   $('#col-preview').classList.add('hide'); $('#col-preview').classList.remove('fields');
   $('#col-pop').classList.remove('show');
   $('#col-popbar').classList.add('hide'); $('#col-popbar').classList.remove('show');
-  $('#col-shutter').classList.remove('armed');
+  const v=$('#col-video'); try{ v.play().catch(()=>{}); }catch(_){}   // resume the live feed
   syncColOrientation();
 }
 function previewNext(){ exitCaptureFlow(); }
 function previewAddData(){
   if(!colPendingCap)return;
-  // keep the big photo on screen (".fields" hides the Next bar) and overlay the data fields
+  // keep the big frozen photo on screen (".fields" hides the Next bar) and overlay the data fields
   $('#col-preview').classList.add('fields');
   showPopout(colPendingCap);
 }
 async function previewDelete(){
-  if(!colPendingCap)return; const id=colPendingCap.id;
+  if(!colPendingCap)return; const cap=colPendingCap; cap._deleted=true;
   exitCaptureFlow();
-  await deleteCapture(id);
+  await deleteCapture(cap.id);
   $('#col-count').textContent=caps.length; renderColRail();
 }
 /* ---- data fields panel (only when "Add data" chosen) — photo stays visible behind/beside it ---- */
@@ -1064,9 +1073,9 @@ async function colPopSave(key,val){
   await putOf('cap',colPendingCap);
 }
 async function colPopDelete(){
-  if(!colPendingCap)return; const id=colPendingCap.id;
+  if(!colPendingCap)return; const cap=colPendingCap; cap._deleted=true;
   exitCaptureFlow();
-  await deleteCapture(id);
+  await deleteCapture(cap.id);
   $('#col-count').textContent=caps.length; renderColRail();
 }
 
